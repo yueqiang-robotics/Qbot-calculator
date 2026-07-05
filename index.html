@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>机器人关节电机选型计算器</title>
+<style>
+  :root {
+    --bg: #0f1923;
+    --panel: #172432;
+    --border: #253548;
+    --text: #c8d6e5;
+    --text-dim: #8395a7;
+    --accent: #00d2ff;
+    --accent2: #7c5cfc;
+    --warn: #f39c12;
+    --good: #2ecc71;
+    --danger: #e74c3c;
+    --input-bg: #1a2d3f;
+    --hover: #1e3448;
+    --radius: 10px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  /* Header */
+  header {
+    background: var(--panel);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: var(--shadow);
+    position: sticky; top:0; z-index:100;
+  }
+  header .logo { font-size:24px; }
+  header h1 { font-size: 20px; font-weight: 600; color: #fff; }
+  header .ver { font-size: 12px; color: var(--text-dim); margin-left:8px; }
+
+  /* Layout */
+  .container { display: grid; grid-template-columns: 380px 1fr; gap: 20px; padding: 20px 32px; max-width: 1400px; margin: 0 auto; }
+  @media (max-width: 900px) { .container { grid-template-columns: 1fr; } }
+
+  /* Panels */
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    box-shadow: var(--shadow);
+  }
+  .panel h2 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .panel h2 .icon { font-size: 20px; }
+
+  /* Form */
+  .form-group { margin-bottom: 18px; }
+  .form-group label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  .form-group label .val { color: var(--accent); font-weight:600; font-size:13px; }
+  .form-group input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+  }
+  .form-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 8px rgba(0,210,255,0.4);
+  }
+  .form-group input[type="number"] {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: #fff;
+    font-size: 15px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+  }
+  .form-group input[type="number"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,210,255,0.1);
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  .btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .btn-primary { background: linear-gradient(135deg, var(--accent), #0097b2); color: #000; }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,210,255,0.3); }
+  .btn-secondary { background: var(--border); color: var(--text); margin-top:8px; }
+  .btn-secondary:hover { background: #354a5f; }
+
+  /* Assumptions toggle */
+  .assumptions-toggle {
+    font-size: 12px;
+    color: var(--accent);
+    cursor: pointer;
+    margin-top: 16px;
+    text-align: center;
+    user-select: none;
+  }
+  .assumptions { display: none; margin-top: 12px; font-size:12px; color:var(--text-dim); }
+  .assumptions.show { display: block; }
+  .assumptions table { width:100%; border-collapse:collapse; }
+  .assumptions td { padding:4px 8px; border-bottom:1px solid var(--border); }
+  .assumptions td:last-child { text-align:right; color:var(--accent); font-weight:600; }
+
+  /* Results */
+  #results-area { display: flex; flex-direction: column; gap: 20px; }
+
+  .card-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  @media (max-width: 1100px) { .card-row { grid-template-columns: 1fr; } }
+  .stat-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+  .stat-card .label { font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+  .stat-card .value { font-size: 32px; font-weight: 700; color: #fff; margin: 4px 0; }
+  .stat-card .unit { font-size: 13px; color: var(--text-dim); }
+  .stat-card.accent .value { color: var(--accent); }
+  .stat-card.warn .value  { color: var(--warn); }
+  .stat-card.good .value  { color: var(--good); }
+
+  /* Joint detail table */
+  .joint-table { width:100%; border-collapse:collapse; font-size:13px; }
+  .joint-table thead th {
+    text-align: left;
+    padding: 10px 12px;
+    background: var(--input-bg);
+    color: var(--text-dim);
+    font-weight: 500;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 2px solid var(--border);
+  }
+  .joint-table tbody td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .joint-table tbody tr:hover { background: var(--hover); }
+  .joint-name { font-weight: 600; color: #fff; }
+  .joint-dof { font-size: 11px; color: var(--text-dim); }
+  .tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .tag-high   { background: rgba(231,76,60,0.2);  color: var(--danger); }
+  .tag-medium { background: rgba(243,156,18,0.2); color: var(--warn); }
+  .tag-low    { background: rgba(46,204,113,0.2); color: var(--good); }
+
+  /* Motor recommendation table */
+  .motor-table { width:100%; border-collapse:collapse; font-size:13px; margin-top:16px; }
+  .motor-table th {
+    text-align: left;
+    padding: 8px 10px;
+    background: var(--input-bg);
+    color: var(--text-dim);
+    font-weight: 500;
+    font-size: 11px;
+    border-bottom: 2px solid var(--border);
+  }
+  .motor-table td { padding: 10px; border-bottom: 1px solid var(--border); }
+  .motor-table .spec-highlight { color: var(--accent); font-weight: 600; }
+
+  /* SVG diagram */
+  .arm-diagram {
+    background: var(--input-bg);
+    border-radius: var(--radius);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .arm-diagram svg { max-width: 100%; }
+
+  /* Tips */
+  .tips {
+    font-size: 12px;
+    color: var(--text-dim);
+    background: var(--input-bg);
+    border-left: 3px solid var(--accent);
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    line-height: 1.8;
+  }
+  .tips strong { color: #fff; }
+
+  /* Print */
+  @media print {
+    body { background: #fff; color: #000; }
+    .panel { box-shadow: none; border: 1px solid #ccc; }
+    header { position: static; }
+    .btn { display: none; }
+  }
+
+  footer {
+    text-align: center;
+    padding: 24px;
+    font-size: 11px;
+    color: var(--text-dim);
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="logo">🤖</span>
+  <h1>机器人关节电机选型计算器</h1>
+  <span class="ver">v1.0</span>
+</header>
+
+<div class="container">
+
+  <!-- ===== LEFT: INPUT PANEL ===== -->
+  <div>
+    <div class="panel">
+      <h2><span class="icon">📐</span> 输入参数</h2>
+
+      <div class="form-group">
+        <label>机器人总重量 <span class="val" id="val-weight">30</span> kg</label>
+        <input type="range" id="weight" min="5" max="200" value="30" step="1">
+      </div>
+
+      <div class="form-group">
+        <label>单臂自由度 (DOF) <span class="val" id="val-dof">6</span></label>
+        <input type="range" id="dof" min="3" max="9" value="6" step="1">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>臂长 <span class="val" id="val-armlen">800</span> mm</label>
+          <input type="range" id="armlen" min="300" max="2000" value="800" step="10">
+        </div>
+        <div class="form-group">
+          <label>手部负载 <span class="val" id="val-payload">3</span> kg</label>
+          <input type="range" id="payload" min="0.5" max="50" value="3" step="0.5">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>安全系数 <span class="val" id="val-safety">2.0</span></label>
+          <input type="range" id="safety" min="1.2" max="4" value="2" step="0.1">
+        </div>
+        <div class="form-group">
+          <label>关节最大速度 <span class="val" id="val-speed">120</span> °/s</label>
+          <input type="range" id="speed" min="30" max="360" value="120" step="10">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>传动效率 <span class="val" id="val-eff">0.85</span></label>
+        <input type="range" id="eff" min="0.6" max="0.95" value="0.85" step="0.01">
+      </div>
+
+      <button class="btn btn-secondary" onclick="resetAll()">↺ 恢复默认</button>
+
+      <div class="assumptions-toggle" onclick="toggleAssumptions()">⚙ 查看计算假设与公式 ▾</div>
+      <div class="assumptions" id="assumptions">
+        <table>
+          <tr><td>单臂占体重比</td><td>10%</td></tr>
+          <tr><td>上臂:前臂:手 质量比</td><td>45:35:20</td></tr>
+          <tr><td>上臂:前臂:手 长度比</td><td>40:35:25</td></tr>
+          <tr><td>质心位置</td><td>各段 50% 处</td></tr>
+          <tr><td>计算姿态</td><td>手臂水平全伸展（最恶劣工况）</td></tr>
+          <tr><td>减速器类型</td><td>谐波减速器 (默认100:1)</td></tr>
+          <tr><td>电机类型</td><td>无刷直流 (BLDC)</td></tr>
+        </table>
+        <p style="margin-top:10px;color:var(--accent);">
+          τⱼ = g × Σ(mᵢ × rᵢ) &nbsp;|&nbsp;
+          τ_motor = τⱼ × S / (R × η) &nbsp;|&nbsp;
+          P = τ × ω / 9.55
+        </p>
+      </div>
+    </div>
+
+    <!-- Tips -->
+    <div class="tips" style="margin-top:16px;">
+      <strong>💡 使用说明</strong><br>
+      ① 拖拽滑块或直接输入数值<br>
+      ② 右侧实时显示各关节扭矩与电机推荐<br>
+      ③ 默认按<strong>仿人机器人单臂(6DOF)</strong>建模<br>
+      ④ 所有计算基于<strong>手臂水平全伸展</strong>最恶劣工况<br>
+      ⑤ 结果仅供参考，实际选型需结合具体结构、惯量等
+    </div>
+  </div>
+
+  <!-- ===== RIGHT: RESULTS PANEL ===== -->
+  <div id="results-area">
+
+    <!-- Summary cards -->
+    <div class="card-row" id="summary-cards"></div>
+
+    <!-- Arm diagram -->
+    <div class="panel">
+      <h2><span class="icon">🦾</span> 关节扭矩分布图</h2>
+      <div id="arm-diagram" class="arm-diagram"></div>
+    </div>
+
+    <!-- Joint torque detail -->
+    <div class="panel">
+      <h2><span class="icon">📊</span> 各关节扭矩详细计算</h2>
+      <div style="overflow-x:auto;">
+        <table class="joint-table" id="joint-table"></table>
+      </div>
+    </div>
+
+    <!-- Motor recommendation -->
+    <div class="panel">
+      <h2><span class="icon">⚡</span> 电机选型推荐</h2>
+      <div style="overflow-x:auto;">
+        <table class="motor-table" id="motor-table"></table>
+      </div>
+      <p style="margin-top:16px;font-size:12px;color:var(--text-dim);">
+        * 默认减速比 100:1（谐波减速器），肩/肘/腕可分别选用 120:1 / 100:1 / 50:1。<br>
+        * 峰值转矩按额定 ×3 估算（BLDC 伺服电机典型过载能力）。
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  机器人关节电机选型计算器 v1.0 &nbsp;|&nbsp;
+  计算模型基于静力学分析，适用于仿人/服务机器人初步选型 &nbsp;|&nbsp;
+  双击本文件即可离线使用，无需网络
+</footer>
+
+<script>
+// ==================== CALCULATION ENGINE ====================
+const G = 9.81; // m/s²
+
+function calc() {
+  // ---- Read inputs ----
+  const W      = parseFloat(document.getElementById('weight').value);   // 机器人总重 kg
+  const N      = parseInt(document.getElementById('dof').value);        // 单臂DOF
+  const L_total = parseFloat(document.getElementById('armlen').value);  // 总臂长 mm
+  const P      = parseFloat(document.getElementById('payload').value);  // 手负载 kg
+  const S      = parseFloat(document.getElementById('safety').value);   // 安全系数
+  const v_max  = parseFloat(document.getElementById('speed').value);    // 最大角速度 °/s
+  const eta    = parseFloat(document.getElementById('eff').value);      // 传动效率
+
+  // ---- Derived arm segment parameters ----
+  const m_arm  = W * 0.10;  // 单臂质量 (10% of body weight)
+  const m1 = m_arm * 0.45;  // 上臂
+  const m2 = m_arm * 0.35;  // 前臂
+  const m3 = m_arm * 0.20;  // 手部
+
+  const L1 = L_total * 0.40 / 1000; // 上臂长度 m
+  const L2 = L_total * 0.35 / 1000; // 前臂长度 m
+  const L3 = L_total * 0.25 / 1000; // 手部长度 m
+
+  // ---- Static joint torques (arm fully horizontal, worst case) ----
+  // Shoulder: supports upper arm + forearm + hand + payload
+  const tau_s_static = G * (
+    m1 * (L1 / 2) +
+    m2 * (L1 + L2 / 2) +
+    m3 * (L1 + L2 + L3 / 2) +
+    P  * (L1 + L2 + L3)
+  );
+
+  // Elbow: supports forearm + hand + payload
+  const tau_e_static = G * (
+    m2 * (L2 / 2) +
+    m3 * (L2 + L3 / 2) +
+    P  * (L2 + L3)
+  );
+
+  // Wrist: supports hand + payload
+  const tau_w_static = G * (
+    m3 * (L3 / 2) +
+    P  * L3
+  );
+
+  // ---- Dynamic torques (with safety factor) ----
+  const tau_s = tau_s_static * S;
+  const tau_e = tau_e_static * S;
+  const tau_w = tau_w_static * S;
+
+  // ---- Remaining DOF torque estimation ----
+  // Beyond the 3 main pitch joints, remaining DOFs are roll/yaw (lower load)
+  // Estimate at ~15-25% of the adjacent main joint
+  const tau_other = tau_w * 0.2;
+  const mainJoints = 3; // shoulder, elbow, wrist pitch
+  const otherJoints = Math.max(0, N - mainJoints);
+
+  // ---- Joint allocations ----
+  const joints = [];
+  // Shoulder group (2-3 DOF typically)
+  joints.push({ name: '肩部俯仰 (J1)',   torque: tau_s,       type: 'high',   gearRatio: 120 });
+  joints.push({ name: '肩部滚转 (J2)',   torque: tau_s * 0.3, type: 'medium', gearRatio: 100 });
+  if (N >= 3) joints.push({ name: '肩部偏航 (J3)', torque: tau_s * 0.25, type: 'medium', gearRatio: 100 });
+
+  // Elbow group
+  if (N >= 4) joints.push({ name: '肘部俯仰 (J4)', torque: tau_e,       type: 'medium', gearRatio: 100 });
+  if (N >= 5) joints.push({ name: '肘部滚转 (J5)', torque: tau_e * 0.2, type: 'low',    gearRatio: 80 });
+
+  // Wrist group
+  if (N >= 6) joints.push({ name: '腕部俯仰 (J6)', torque: tau_w,       type: 'low',    gearRatio: 50 });
+  if (N >= 7) joints.push({ name: '腕部滚转 (J7)', torque: tau_w * 0.15, type: 'low',    gearRatio: 50 });
+  if (N >= 8) joints.push({ name: '腕部偏航 (J8)', torque: tau_w * 0.12, type: 'low',    gearRatio: 50 });
+  if (N >= 9) joints.push({ name: '附加关节 (J9)', torque: tau_w * 0.1,  type: 'low',    gearRatio: 50 });
+
+  // Take only first N joints
+  const selectedJoints = joints.slice(0, N);
+
+  // ---- Motor specs for each joint ----
+  const results = selectedJoints.map(j => {
+    const R = j.gearRatio;                   // gear ratio
+    const motorTorque = j.torque / (R * eta); // motor rated torque Nm
+    const jointSpeedRpm = v_max / 6;          // joint speed rpm (°/s ÷ 6 = rpm)
+    const motorSpeed = jointSpeedRpm * R;     // motor speed rpm
+    const motorPower = motorTorque * motorSpeed / 9.55; // P(W) = τ(Nm) × ω(rpm) / 9.55
+    const peakTorque = motorTorque * 3;       // peak ≈ 3× rated
+
+    return {
+      ...j,
+      motorTorque: motorTorque,
+      motorSpeed: motorSpeed,
+      motorPower: motorPower,
+      peakTorque: peakTorque,
+      jointSpeedRpm: jointSpeedRpm,
+    };
+  });
+
+  // ---- Max values for summary ----
+  const maxTorque    = Math.max(...results.map(r => r.torque));
+  const maxMotorPower = Math.max(...results.map(r => r.motorPower));
+  const totalPower   = results.reduce((s, r) => s + r.motorPower, 0);
+
+  // ---- Render all ----
+  renderSummary(maxTorque, maxMotorPower, totalPower, N, results);
+  renderJointTable(results);
+  renderMotorTable(results);
+  renderDiagram(results, L1, L2, L3);
+  updateLabels(W, N, L_total, P, S, v_max, eta);
+}
+
+// ==================== RENDER FUNCTIONS ====================
+
+function renderSummary(maxTorque, maxMotorPower, totalPower, N, results) {
+  const bestMotor = results.reduce((a,b) => a.motorPower > b.motorPower ? a : b);
+  document.getElementById('summary-cards').innerHTML = `
+    <div class="stat-card accent">
+      <div class="label">肩关节最大转矩</div>
+      <div class="value">${maxTorque.toFixed(1)}</div>
+      <div class="unit">Nm（动态，含安全系数）</div>
+    </div>
+    <div class="stat-card warn">
+      <div class="label">电机总功率需求</div>
+      <div class="value">${totalPower.toFixed(0)}</div>
+      <div class="unit">W（${N}台电机合计）</div>
+    </div>
+    <div class="stat-card good">
+      <div class="label">最大单电机功率</div>
+      <div class="value">${maxMotorPower.toFixed(0)}</div>
+      <div class="unit">W（${bestMotor.name}）</div>
+    </div>
+  `;
+}
+
+function renderJointTable(results) {
+  const rows = results.map((r, i) => `
+    <tr>
+      <td><span class="joint-name">${r.name}</span></td>
+      <td>${r.torque.toFixed(2)} Nm</td>
+      <td><span class="tag ${r.type==='high'?'tag-high':r.type==='medium'?'tag-medium':'tag-low'}">${r.type==='high'?'高负载':r.type==='medium'?'中负载':'低负载'}</span></td>
+      <td>${r.gearRatio}:1</td>
+      <td>${r.motorTorque.toFixed(3)} Nm</td>
+      <td>${r.motorSpeed.toFixed(0)} rpm</td>
+      <td>${r.motorPower.toFixed(1)} W</td>
+    </tr>
+  `).join('');
+
+  document.getElementById('joint-table').innerHTML = `
+    <thead>
+      <tr>
+        <th>关节</th>
+        <th>关节需求转矩</th>
+        <th>负载等级</th>
+        <th>推荐减速比</th>
+        <th>电机额定转矩</th>
+        <th>电机转速</th>
+        <th>电机功率</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  `;
+}
+
+function renderMotorTable(results) {
+  // Group by type for motor recommendations
+  const highLoad = results.filter(r => r.type === 'high');
+  const medLoad  = results.filter(r => r.type === 'medium');
+  const lowLoad  = results.filter(r => r.type === 'low');
+
+  const rows = [];
+
+  if (highLoad.length > 0) {
+    const r = highLoad[0];
+    rows.push(`
+      <tr>
+        <td><span class="tag tag-high">高负载组</span></td>
+        <td>${highLoad.map(j=>j.name).join('、')}</td>
+        <td>外转子BLDC</td>
+        <td>${r.gearRatio}:1 谐波</td>
+        <td class="spec-highlight">≥ ${(r.motorTorque*1.15).toFixed(2)} Nm</td>
+        <td class="spec-highlight">≥ ${(r.motorTorque*3*1.15).toFixed(2)} Nm</td>
+        <td>${r.motorSpeed.toFixed(0)}</td>
+        <td>${r.motorPower.toFixed(0)}</td>
+        <td>48V</td>
+      </tr>
+    `);
+  }
+  if (medLoad.length > 0) {
+    const r = medLoad[0];
+    rows.push(`
+      <tr>
+        <td><span class="tag tag-medium">中负载组</span></td>
+        <td>${medLoad.map(j=>j.name).join('、')}</td>
+        <td>内转子BLDC</td>
+        <td>${r.gearRatio}:1 谐波/行星</td>
+        <td class="spec-highlight">≥ ${(r.motorTorque*1.15).toFixed(2)} Nm</td>
+        <td class="spec-highlight">≥ ${(r.motorTorque*3*1.15).toFixed(2)} Nm</td>
+        <td>${r.motorSpeed.toFixed(0)}</td>
+        <td>${r.motorPower.toFixed(0)}</td>
+        <td>24-48V</td>
+      </tr>
+    `);
+  }
+  if (lowLoad.length > 0) {
+    const r = lowLoad[0];
+    rows.push(`
+      <tr>
+        <td><span class="tag tag-low">低负载组</span></td>
+        <td>${lowLoad.map(j=>j.name).join('、')}</td>
+        <td>微型BLDC/步进</td>
+        <td>${r.gearRatio}:1 行星</td>
+        <td class="spec-highlight">≥ ${(r.motorTorque*1.15).toFixed(2)} Nm</td>
+        <td class="spec-highlight">≥ ${(r.motorTorque*3*1.15).toFixed(2)} Nm</td>
+        <td>${r.motorSpeed.toFixed(0)}</td>
+        <td>${r.motorPower.toFixed(0)}</td>
+        <td>24V</td>
+      </tr>
+    `);
+  }
+
+  document.getElementById('motor-table').innerHTML = `
+    <thead>
+      <tr>
+        <th>分组</th>
+        <th>适用关节</th>
+        <th>推荐电机类型</th>
+        <th>推荐减速方案</th>
+        <th>额定转矩 ≥</th>
+        <th>峰值转矩 ≥</th>
+        <th>额定转速 rpm</th>
+        <th>功率 W</th>
+        <th>推荐电压</th>
+      </tr>
+    </thead>
+    <tbody>${rows.join('')}</tbody>
+  `;
+}
+
+function renderDiagram(results, L1, L2, L3) {
+  // SVG arm diagram with torque annotations
+  const w = 600, h = 420;
+  const cx = 100, cy = 80; // shoulder origin
+  const scale = 0.55;       // pixels per mm (at 800mm arm = 440px drawing)
+  const armPx = (L1 + L2 + L3) * 1000 * scale;
+
+  // Link joint positions
+  const sX = cx, sY = cy;
+  const eX = sX + L1 * 1000 * scale;
+  const eY = sY;
+  const wX = eX + L2 * 1000 * scale;
+  const wY = sY;
+  const tipX = wX + L3 * 1000 * scale;
+  const tipY = sY;
+
+  // Get torque values
+  const tauS = results.find(r => r.name.includes('肩部俯仰'));
+  const tauE = results.find(r => r.name.includes('肘部俯仰'));
+  const tauW = results.find(r => r.name.includes('腕部俯仰'));
+
+  // Gravity arrow
+  const gravityArrows = `
+    <text x="${sX + (tipX-sX)/2}" y="${sY + 60}" fill="#e74c3c" font-size="11" text-anchor="middle">↓ 重力方向（最恶劣工况：手臂水平伸展）</text>
+    <line x1="${sX + (tipX-sX)/2}" y1="${sY + 35}" x2="${sX + (tipX-sX)/2}" y2="${sY + 45}" stroke="#e74c3c" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+    <defs><marker id="arrowRed" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#e74c3c"/></marker></defs>
+  `;
+
+  const armSVG = `
+    <svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+      <!-- Base / shoulder -->
+      <rect x="${sX-18}" y="${sY-6}" width="36" height="66" rx="4" fill="#2c3e50" stroke="#00d2ff" stroke-width="2"/>
+      <text x="${sX}" y="${sY-30}" fill="#00d2ff" font-size="10" text-anchor="middle" font-weight="600">肩部</text>
+      <circle cx="${sX}" cy="${sY}" r="8" fill="#00d2ff" stroke="#0f1923" stroke-width="2"/>
+      ${tauS ? `<text x="${sX}" y="${sY-16}" fill="#f39c12" font-size="11" text-anchor="middle" font-weight="700">${tauS.torque.toFixed(1)} Nm</text>` : ''}
+
+      <!-- Upper arm -->
+      <rect x="${sX}" y="${sY-14}" width="${eX-sX}" height="28" rx="10" fill="#34495e" stroke="#5a7d9a" stroke-width="2"/>
+      <text x="${(sX+eX)/2}" y="${sY+24}" fill="#8395a7" font-size="10" text-anchor="middle">上臂 ${(L1*1000).toFixed(0)}mm · ${(L1*1000*0.45*0.10*parseFloat(document.getElementById('weight').value)).toFixed(1)}kg</text>
+
+      <!-- Elbow joint -->
+      <circle cx="${eX}" cy="${eY}" r="6" fill="#7c5cfc" stroke="#0f1923" stroke-width="2"/>
+      <text x="${eX}" y="${eY-16}" fill="#7c5cfc" font-size="10" text-anchor="middle" font-weight="600">肘部</text>
+      ${tauE ? `<text x="${eX}" y="${eY+32}" fill="#f39c12" font-size="11" text-anchor="middle" font-weight="700">${tauE.torque.toFixed(1)} Nm</text>` : ''}
+
+      <!-- Forearm -->
+      <rect x="${eX}" y="${eY-12}" width="${wX-eX}" height="24" rx="8" fill="#34495e" stroke="#5a7d9a" stroke-width="2"/>
+      <text x="${(eX+wX)/2}" y="${eY+22}" fill="#8395a7" font-size="10" text-anchor="middle">前臂 ${(L2*1000).toFixed(0)}mm · ${(L2*1000*0.35*0.10*parseFloat(document.getElementById('weight').value)).toFixed(1)}kg</text>
+
+      <!-- Wrist joint -->
+      <circle cx="${wX}" cy="${wY}" r="5" fill="#2ecc71" stroke="#0f1923" stroke-width="2"/>
+      <text x="${wX}" y="${wY-16}" fill="#2ecc71" font-size="10" text-anchor="middle" font-weight="600">腕部</text>
+      ${tauW ? `<text x="${wX}" y="${wY+32}" fill="#f39c12" font-size="11" text-anchor="middle" font-weight="700">${tauW.torque.toFixed(1)} Nm</text>` : ''}
+
+      <!-- Hand + payload -->
+      <rect x="${wX}" y="${wY-10}" width="${tipX-wX}" height="20" rx="6" fill="#2c3e50" stroke="#5a7d9a" stroke-width="2"/>
+      <text x="${(wX+tipX)/2}" y="${wY+22}" fill="#8395a7" font-size="10" text-anchor="middle">手部 ${(L3*1000).toFixed(0)}mm</text>
+
+      <!-- Payload box -->
+      <rect x="${tipX}" y="${wY-16}" width="30" height="32" rx="4" fill="#e74c3c" opacity="0.7"/>
+      <text x="${tipX+15}" y="${wY+2}" fill="#fff" font-size="9" text-anchor="middle">负载</text>
+      <text x="${tipX+15}" y="${wY+16}" fill="#fff" font-size="10" text-anchor="middle" font-weight="700">${parseFloat(document.getElementById('payload').value)}kg</text>
+
+      ${gravityArrows}
+    </svg>
+  `;
+
+  document.getElementById('arm-diagram').innerHTML = armSVG;
+}
+
+function updateLabels(W, N, L_total, P, S, v_max, eta) {
+  document.getElementById('val-weight').textContent = W;
+  document.getElementById('val-dof').textContent = N;
+  document.getElementById('val-armlen').textContent = L_total;
+  document.getElementById('val-payload').textContent = P;
+  document.getElementById('val-safety').textContent = S.toFixed(1);
+  document.getElementById('val-speed').textContent = v_max;
+  document.getElementById('val-eff').textContent = eta.toFixed(2);
+}
+
+function toggleAssumptions() {
+  document.getElementById('assumptions').classList.toggle('show');
+}
+
+function resetAll() {
+  document.getElementById('weight').value = 30;
+  document.getElementById('dof').value = 6;
+  document.getElementById('armlen').value = 800;
+  document.getElementById('payload').value = 3;
+  document.getElementById('safety').value = 2;
+  document.getElementById('speed').value = 120;
+  document.getElementById('eff').value = 0.85;
+  calc();
+}
+
+// Attach listeners to all inputs
+document.querySelectorAll('input').forEach(el => {
+  el.addEventListener('input', calc);
+});
+
+// Initial calculation
+calc();
+</script>
+
+</body>
+</html>
