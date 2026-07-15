@@ -1,0 +1,17 @@
+Qbot Pro — 机器人结构快速估算平台
+
+Copyright 2026 YUEQ（岳强）
+Original project: https://github.com/yueqiang-robotics/Qbot-calculator
+
+Qbot Pro 的原始产品设计、计算框架、界面设计与文档由 YUEQ 创建。
+
+依据 Apache License 2.0 再发布本项目或其衍生作品时，应保留本 NOTICE
+中的适用署名信息；修改过的文件应明确标注已经修改，不得将衍生版本
+表述为作者发布、认可或担保的官方版本。
+
+Apache License 2.0 不授予对 Qbot、Qbot Pro 名称、项目标识或作者头像的
+商标、形象或背书使用权，但允许为说明作品来源而进行合理引用。
+
+本软件仅用于机器人结构概念阶段的早期估算、方案比较与选型门槛收敛，
+不构成正式设计、采购承诺、认证意见、质量保证、安全结论或专业工程意见。
+结果必须结合现行标准、厂家正式资料、CAD、仿真和实机试验独立复核。
