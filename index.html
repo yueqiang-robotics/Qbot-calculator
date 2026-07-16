@@ -188,6 +188,15 @@ input,select,button{font-family:inherit}
 .r-card.warn .r-value{color:var(--warn)}
 .r-card.good .r-value{color:var(--good)}
 .r-card.danger .r-value{color:var(--danger)}
+.gear-sketch{margin:0 0 16px;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:#111614;box-shadow:var(--shadow)}
+.gear-sketch-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:11px 14px;border-bottom:1px solid var(--border);background:#181d1b}
+.gear-sketch-head strong{display:block;color:#fff;font-size:13px;margin-bottom:2px}.gear-sketch-head span{display:block;color:var(--text-dim);font-size:10px;line-height:1.45}
+.gear-sketch-chip{flex:0 0 auto;padding:3px 7px;border:1px solid rgba(43,201,162,.42);border-radius:10px;color:var(--accent)!important;background:var(--accent-dim);font-size:9px!important;font-weight:700}
+.gear-sketch-canvas{display:block;width:100%;max-width:520px;height:auto;margin:0 auto;background:#111614}
+.gear-combo-assist{margin:4px 0 15px;padding:12px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.gear-combo-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}.gear-combo-head strong{display:block;color:#fff;font-size:12px}.gear-combo-head span{display:block;color:var(--text-dim);font-size:10px;line-height:1.45;margin-top:2px}.gear-combo-badge{flex:0 0 auto;color:var(--accent)!important;font-weight:700}
+.gear-combo-list{display:grid;gap:6px;margin-top:9px}.gear-combo-row{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(58px,.7fr) minmax(0,1fr) 18px;align-items:center;gap:7px;width:100%;max-width:100%;padding:8px 9px;border:1px solid var(--border);border-radius:5px;background:#202623;color:var(--text);text-align:left;cursor:pointer;overflow:hidden}.gear-combo-row:hover{border-color:var(--accent);background:var(--accent-dim)}.gear-combo-row.selected{border-color:var(--accent);box-shadow:inset 3px 0 0 var(--accent)}.gear-combo-row strong{display:block;color:#fff;font-size:11px}.gear-combo-row span{min-width:0;font-size:10px;color:var(--text-dim);line-height:1.4;overflow-wrap:anywhere}.gear-combo-row .combo-ratio{color:var(--accent);font-weight:700}.gear-combo-row .combo-apply{color:var(--accent);font-size:16px;text-align:right}.gear-combo-empty{padding:8px 9px;border-left:3px solid var(--warn);background:rgba(243,156,18,.06);color:var(--text-dim);font-size:10px;line-height:1.5}.gear-combo-foot{margin-top:7px;color:var(--text-dim);font-size:9px;line-height:1.5}
+@media(max-width:600px){.gear-combo-row{grid-template-columns:1fr 1fr}.gear-combo-row .combo-apply{display:none}}
 .data-table{width:100%;border-collapse:collapse;font-size:12px;margin:10px 0}
 .data-table th{
   text-align:left;padding:7px 10px;background:#202623;color:var(--text-dim);
@@ -1264,6 +1273,84 @@ function calcChassis(){
 // ============================================================
 // CALC: Gear (Parallel axis & Planetary)
 // ============================================================
+function gearSketchShell(id,title,caption,width,height){
+  return `<div class="gear-sketch"><div class="gear-sketch-head"><div><strong>${title}</strong><span>${caption}</span></div><span class="gear-sketch-chip">参数联动</span></div><canvas class="gear-sketch-canvas" id="${id}" width="${width}" height="${height}" aria-label="${title}"></canvas></div>`;
+}
+
+function gearCanvasBase(canvas){
+  if(!canvas)return null;
+  const ctx=canvas.getContext('2d'),W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle='#111614';ctx.fillRect(0,0,W,H);
+  ctx.lineCap='round';ctx.lineJoin='round';
+  return{ctx,W,H};
+}
+
+function traceGearTeeth(ctx,cx,cy,pitchR,teeth,addendum,dedendum,phase=0,internal=false){
+  const tipR=internal?pitchR-addendum:pitchR+addendum;
+  const rootR=internal?pitchR+dedendum:pitchR-dedendum;
+  const midR=(rootR+tipR)/2,step=Math.PI*2/teeth,profile=[[-.5,rootR],[-.36,rootR],[-.24,midR],[-.12,tipR],[.12,tipR],[.24,midR],[.36,rootR],[.5,rootR]];
+  ctx.beginPath();
+  for(let i=0;i<teeth;i++)for(const[f,r]of profile){const a=phase+(i+f)*step,x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r;if(i===0&&f===-.5)ctx.moveTo(x,y);else ctx.lineTo(x,y)}
+  ctx.closePath();
+}
+
+function drawGearPitchCircle(ctx,cx,cy,r,color){
+  ctx.save();ctx.setLineDash([6,6]);ctx.strokeStyle=color;ctx.globalAlpha=.38;ctx.lineWidth=1;ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.stroke();ctx.restore();
+}
+
+function drawGearCenter(ctx,cx,cy,r,color){
+  ctx.save();ctx.strokeStyle=color;ctx.lineWidth=1.4;ctx.fillStyle='#111614';ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.globalAlpha=.45;ctx.beginPath();ctx.moveTo(cx-r-7,cy);ctx.lineTo(cx+r+7,cy);ctx.moveTo(cx,cy-r-7);ctx.lineTo(cx,cy+r+7);ctx.stroke();ctx.restore();
+}
+
+function drawGearDimension(ctx,x1,x2,y,label){
+  ctx.save();ctx.strokeStyle='#66746e';ctx.fillStyle='#9eaaa5';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(x1,y);ctx.lineTo(x2,y);ctx.stroke();ctx.setLineDash([]);ctx.beginPath();ctx.moveTo(x1,y-7);ctx.lineTo(x1,y+7);ctx.moveTo(x2,y-7);ctx.lineTo(x2,y+7);ctx.stroke();ctx.font='500 15px "Microsoft YaHei",sans-serif';ctx.textAlign='center';ctx.fillText(label,(x1+x2)/2,y+25);ctx.restore();
+}
+
+function drawGearPlaceholder(canvas,title,detail){
+  const base=gearCanvasBase(canvas);if(!base)return;const{ctx,W,H}=base;
+  ctx.strokeStyle='#44504b';ctx.lineWidth=2;ctx.setLineDash([8,7]);ctx.beginPath();ctx.arc(W/2,H/2-15,Math.min(W,H)*.22,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle='#d7dfdb';ctx.textAlign='center';ctx.font='700 20px "Microsoft YaHei",sans-serif';ctx.fillText(title,W/2,H/2-6);ctx.fillStyle='#82908a';ctx.font='400 14px "Microsoft YaHei",sans-serif';ctx.fillText(detail,W/2,H/2+25);
+}
+
+function drawSpurGearCanvas(canvas,m,z1,z2){
+  if(!(m>0)||![z1,z2].every(Number.isInteger)||z1<3||z2<3){drawGearPlaceholder(canvas,'等待有效齿数','请输入正模数和整数齿数');return}
+  if(Math.max(z1,z2)>360){drawGearPlaceholder(canvas,'齿数过高，未绘制齿形','为保持输入交互流畅，示意图支持单轮不超过360齿');return}
+  const base=gearCanvasBase(canvas);if(!base)return;const{ctx,W,H}=base;
+  const r1=m*z1/2,r2=m*z2/2,scale=Math.min((W-120)/(2*(r1+r2)+5*m),(H-125)/(2*Math.max(r1,r2)+2.5*m));
+  const total=(2*(r1+r2)+2.5*m)*scale,left=(W-total)/2,c1=left+(r1+1.25*m)*scale,c2=c1+(r1+r2)*scale,cy=(H-68)/2;
+  const pr1=r1*scale,pr2=r2*scale,add=m*scale,ded=1.25*m*scale;
+  ctx.fillStyle='#82908a';ctx.font='400 14px "Microsoft YaHei",sans-serif';ctx.textAlign='left';ctx.fillText('齿数逐齿绘制 · 虚线为分度圆 · 齿形为非渐开线简化示意',22,27);
+  ctx.strokeStyle='#43504a';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(c1,cy);ctx.lineTo(c2,cy);ctx.stroke();
+  traceGearTeeth(ctx,c1,cy,pr1,z1,add,ded,0,false);ctx.fillStyle='#16201d';ctx.fill();ctx.strokeStyle='#5ccdad';ctx.lineWidth=1.7;ctx.stroke();
+  traceGearTeeth(ctx,c2,cy,pr2,z2,add,ded,Math.PI+Math.PI/z2,false);ctx.fillStyle='#151d22';ctx.fill();ctx.strokeStyle='#70aee0';ctx.lineWidth=1.7;ctx.stroke();
+  drawGearPitchCircle(ctx,c1,cy,pr1,'#5ccdad');drawGearPitchCircle(ctx,c2,cy,pr2,'#70aee0');
+  drawGearCenter(ctx,c1,cy,Math.max(7,Math.min(18,pr1*.16)),'#5ccdad');drawGearCenter(ctx,c2,cy,Math.max(7,Math.min(18,pr2*.16)),'#70aee0');
+  const label=(x,r,name,z,d,color)=>{ctx.fillStyle=color;ctx.textAlign='center';ctx.font='700 16px "Microsoft YaHei",sans-serif';if(r>58){ctx.fillText(name,x,cy-8);ctx.font='600 15px "Microsoft YaHei",sans-serif';ctx.fillText(`z=${z}`,x,cy+15)}else ctx.fillText(`z=${z}`,x,cy+5);ctx.fillStyle='#9eaaa5';ctx.font='400 13px "Microsoft YaHei",sans-serif';ctx.fillText(`d=${d.toFixed(1)} mm`,x,Math.min(H-80,cy+r+30))};
+  label(c1,pr1,'主动轮',z1,m*z1,'#77d8bd');label(c2,pr2,'从动轮',z2,m*z2,'#8bc5ed');
+  drawGearDimension(ctx,c1,c2,H-54,`中心距 a=${(m*(z1+z2)/2).toFixed(1)} mm · 速比 i=${(z2/z1).toFixed(2)}`);
+  canvas.dataset.gearTeeth=`${z1},${z2}`;
+}
+
+function drawPlanetaryGearCanvas(canvas,m,np,zs,zr){
+  const zp=(zr-zs)/2,valid=Number.isInteger(np)&&np>=2&&np<=12&&[zs,zr,zp].every(Number.isInteger)&&m>0&&zs>=3&&zp>=3&&zr===zs+2*zp&&(zs+zr)%np===0;
+  if(!valid){drawGearPlaceholder(canvas,'行星几何或装配条件不成立','需满足 zᵣ=zₛ+2zₚ 且 (zₛ+zᵣ)/nₚ 为整数');return}
+  if(Math.max(zs,zp,zr)>360){drawGearPlaceholder(canvas,'齿数过高，未绘制齿形','为保持输入交互流畅，示意图支持单轮不超过360齿');return}
+  const base=gearCanvasBase(canvas);if(!base)return;const{ctx,W,H}=base;
+  const rs=m*zs/2,rp=m*zp/2,rr=m*zr/2,scale=Math.min((W-150)/(2*(rr+2.5*m)),(H-105)/(2*(rr+2.5*m)));
+  const cx=W/2,cy=(H-62)/2,prs=rs*scale,prp=rp*scale,prr=rr*scale,add=m*scale,ded=1.25*m*scale,orbit=(rs+rp)*scale;
+  ctx.fillStyle='#82908a';ctx.font='400 14px "Microsoft YaHei",sans-serif';ctx.textAlign='left';ctx.fillText('按分度圆比例布置 · 内齿形与外齿形均为简化示意',22,27);
+  const planets=[];for(let i=0;i<np;i++){const a=-Math.PI/2+i*Math.PI*2/np;planets.push({x:cx+Math.cos(a)*orbit,y:cy+Math.sin(a)*orbit,a})}
+  ctx.save();ctx.strokeStyle='#9a7a45';ctx.globalAlpha=.48;ctx.lineWidth=2.4;for(const p of planets){ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(p.x,p.y);ctx.stroke()}ctx.beginPath();ctx.arc(cx,cy,Math.max(12,prs*.2),0,Math.PI*2);ctx.stroke();ctx.restore();
+  ctx.strokeStyle='#d5dfda';ctx.lineWidth=1.7;ctx.beginPath();ctx.arc(cx,cy,prr+2.25*m*scale,0,Math.PI*2);ctx.stroke();
+  traceGearTeeth(ctx,cx,cy,prr,zr,add,ded,-Math.PI/2,true);ctx.strokeStyle='#d5dfda';ctx.lineWidth=1.7;ctx.stroke();drawGearPitchCircle(ctx,cx,cy,prr,'#d5dfda');
+  traceGearTeeth(ctx,cx,cy,prs,zs,add,ded,-Math.PI/2,false);ctx.fillStyle='#16201d';ctx.fill();ctx.strokeStyle='#5ccdad';ctx.lineWidth=1.7;ctx.stroke();drawGearPitchCircle(ctx,cx,cy,prs,'#5ccdad');drawGearCenter(ctx,cx,cy,Math.max(7,Math.min(16,prs*.18)),'#5ccdad');
+  for(let i=0;i<planets.length;i++){const p=planets[i];traceGearTeeth(ctx,p.x,p.y,prp,zp,add,ded,p.a+Math.PI/zp,false);ctx.fillStyle='#151d22';ctx.fill();ctx.strokeStyle='#70aee0';ctx.lineWidth=1.6;ctx.stroke();drawGearPitchCircle(ctx,p.x,p.y,prp,'#70aee0');drawGearCenter(ctx,p.x,p.y,Math.max(5,Math.min(12,prp*.17)),'#70aee0')}
+  ctx.textAlign='center';ctx.fillStyle='#77d8bd';ctx.font='700 15px "Microsoft YaHei",sans-serif';ctx.fillText(`太阳 zₛ=${zs}`,cx,cy+5);
+  if(prp>28){ctx.fillStyle='#8bc5ed';ctx.font='600 13px "Microsoft YaHei",sans-serif';ctx.fillText(`zₚ=${zp}`,planets[0].x,planets[0].y+5)}
+  const y=H-25;ctx.textAlign='center';ctx.font='600 14px "Microsoft YaHei",sans-serif';ctx.fillStyle='#77d8bd';ctx.fillText(`太阳轮 zₛ=${zs} · d=${(m*zs).toFixed(1)} mm`,W*.2,y);ctx.fillStyle='#8bc5ed';ctx.fillText(`行星轮 zₚ=${zp} · ×${np}`,W*.5,y);ctx.fillStyle='#d5dfda';ctx.fillText(`内齿圈 zᵣ=${zr} · i=${((zr+zs)/zs).toFixed(2)}`,W*.8,y);
+  canvas.dataset.gearTeeth=`${zs},${zp},${zr}`;canvas.dataset.planetCount=String(np);
+}
+
 function calcSpurGear(){
   const m=+document.getElementById('sg_module').value;
   const b=+document.getElementById('sg_facewidth').value;
@@ -1277,7 +1364,8 @@ function calcSpurGear(){
   const mat1=GEAR_MATERIALS[matKey1]||GEAR_MATERIALS['45钢调质'],mat2=GEAR_MATERIALS[matKey2]||GEAR_MATERIALS['45钢调质'],contactAllow=Math.min(mat1[1],mat2[1]);
   const errors=[];
   if(!(m>0))errors.push('模数必须大于0');if(!(b>0))errors.push('齿宽必须大于0');if(!Number.isInteger(z1)||!Number.isInteger(z2))errors.push('齿数必须为整数');else if(z1<17||z2<17)errors.push('当前模型按20°标准全齿高无变位齿轮计算，主动轮和从动轮齿数均须≥17；少齿设计需引入变位系数后另行校核');if(!(T1>=0)||!(rpm>0))errors.push('转矩不得为负且转速必须大于0');if(!(Ka>=1)||!(meshEta>0&&meshEta<=1))errors.push('使用系数应≥1，效率应在0~1之间');
-  if(errors.length){document.getElementById('sgResults').innerHTML=`<div class="status-box danger"><strong>输入无效</strong><br>${errors.join('；')}</div>`;return;}
+  const sketch=gearSketchShell('sgGearCanvas','平行轴齿轮比例与齿数示意','分度圆尺寸、中心距和每轮实际齿数随左侧参数更新',960,480);
+  if(errors.length){document.getElementById('sgResults').innerHTML=`${sketch}<div class="status-box danger"><strong>输入无效</strong><br>${errors.join('；')}</div>`;drawSpurGearCanvas(document.getElementById('sgGearCanvas'),m,z1,z2);return;}
 
   const d1=m*z1, d2=m*z2;
   const a=(d1+d2)/2;
@@ -1297,7 +1385,7 @@ function calcSpurGear(){
   const utilization=T1Allow>0?T1/T1Allow*100:Infinity;
   const sbSafe=sigmaB1<mat1[0]&&sigmaB2<mat2[0],shSafe=sigmaH<contactAllow,allSafe=sbSafe&&shSafe;
 
-  document.getElementById('sgResults').innerHTML=`
+  document.getElementById('sgResults').innerHTML=`${sketch}
     <div class="result-cards" style="grid-template-columns:repeat(4,1fr)">
       <div class="r-card ${allSafe?'good':'danger'}"><div class="r-label">主动轮许用输入</div><div class="r-value">${T1Allow.toFixed(2)}</div><div class="r-unit">Nm · 当前 ${T1.toFixed(2)} Nm</div></div>
       <div class="r-card ${allSafe?'good':'danger'}"><div class="r-label">从动轮许用输出</div><div class="r-value">${T2Allow.toFixed(2)}</div><div class="r-unit">Nm · 当前约 ${T2.toFixed(2)} Nm</div></div>
@@ -1324,6 +1412,7 @@ function calcSpurGear(){
       齿根采用 Lewis 式 σF=Ft·Ka·Kv/(b·m·πy)，其中 y=0.154−0.912/z；Kv=1+v/10 仅是未指定精度等级时的简化速度系数。<br>
       <strong>${allSafe?'当前扭矩低于简化许用值':'当前扭矩超过简化许用值'}</strong> · 接触许用值取两轮材料中较低者 ${contactAllow} MPa · 材料表为概念阶段参考许用值，未计齿向分布、精度、修形、可靠度、润滑与温度，定型仍按 GB/T 3480 / ISO 6336 复核。
     </div>`;
+  drawSpurGearCanvas(document.getElementById('sgGearCanvas'),m,z1,z2);
   autoSave();
 }
 
@@ -1348,7 +1437,8 @@ function calcPlanetaryGear(){
   if(Number.isInteger(zs)&&Number.isInteger(zp)&&(zs<17||zp<17))errors.push('当前模型按20°标准全齿高无变位外齿轮计算，太阳轮和行星轮齿数均须≥17；少齿设计需引入变位系数后另行校核');
   if(!Number.isInteger(zp))errors.push('(内齿圈齿数−太阳轮齿数)/2 必须为整数');
   if(Number.isInteger(np)&&(zs+zr)%np!==0)errors.push('(太阳轮齿数+内齿圈齿数)/行星数 必须为整数，才能等间距装配');
-  if(errors.length){document.getElementById('pgResults').innerHTML=`<div class="status-box danger"><strong>几何/装配条件不成立</strong><br>${errors.join('；')}</div>`;return;}
+  const sketch=gearSketchShell('pgGearCanvas','NGW行星齿轮比例与齿数示意','太阳轮、行星轮、内齿圈及行星数量随左侧参数更新',960,560);
+  if(errors.length){document.getElementById('pgResults').innerHTML=`${sketch}<div class="status-box danger"><strong>几何/装配条件不成立</strong><br>${errors.join('；')}</div>`;drawPlanetaryGearCanvas(document.getElementById('pgGearCanvas'),m,np,zs,zr);return;}
   const ratio = (zr + zs) / zs; // ring fixed, sun input, carrier output
   const Tplanet = Ti / np; // reporting only
   const ds=m*zs, dp=m*zp;
@@ -1365,7 +1455,7 @@ function calcPlanetaryGear(){
   const TiAllow=FtAllow*(ds/1000)/2*np/loadShare,ToAllow=TiAllow*ratio*meshEta,To=Ti*ratio*meshEta,utilization=Ti/TiAllow*100;
   const sbSafe=sigmaBS<mat[0]&&sigmaBP<mat[0],shSafe=sigmaH<mat[1],allSafe=sbSafe&&shSafe;
 
-  document.getElementById('pgResults').innerHTML=`
+  document.getElementById('pgResults').innerHTML=`${sketch}
     <div class="result-cards" style="grid-template-columns:repeat(4,1fr)">
       <div class="r-card ${allSafe?'good':'danger'}"><div class="r-label">太阳轮许用输入</div><div class="r-value">${TiAllow.toFixed(2)}</div><div class="r-unit">Nm · 当前 ${Ti.toFixed(2)} Nm</div></div>
       <div class="r-card ${allSafe?'good':'danger'}"><div class="r-label">行星架许用输出</div><div class="r-value">${ToAllow.toFixed(2)}</div><div class="r-unit">Nm · 当前约 ${To.toFixed(2)} Nm</div></div>
@@ -1390,6 +1480,7 @@ function calcPlanetaryGear(){
       齿根采用 Lewis 式 σF=Ft·Ka·Kv/(b·m·πy)，其中 y=0.154−0.912/z；Kv=1+v/10 仅是简化速度系数。<br>
       <strong>${allSafe?'当前扭矩低于简化许用值':'当前扭矩超过简化许用值'}</strong> · 材料表为概念阶段参考许用值；尚未校核内齿圈内啮合、行星销轴、轴承、行星架与浮动均载，定型按 GB/T 3480 / ISO 6336 复核。
     </div>`;
+  drawPlanetaryGearCanvas(document.getElementById('pgGearCanvas'),m,np,zs,zr);
   autoSave();
 }
 
@@ -2021,7 +2112,7 @@ function renderGearCalc(){
     <div class="audit-strip"><span class="audit-icon">i</span><div><strong>概念校核，不替代标准计算</strong><br>V4 新增齿数、根切和行星装配条件检查，并修正太阳轮分流载荷路径。最终设计仍应按 GB/T 3480 或 ISO 6336 输入齿形、精度、载荷谱、润滑和可靠度系数。</div></div>
     ${state.sub==='spur'?renderSpurGearForm():renderPlanetaryGearForm()}`;
   restoreCurrentInputs();
-  if(state.sub==='spur'){bindSpurEvents();calcSpurGear();} else {bindPlanetaryEvents();calcPlanetaryGear();}
+  if(state.sub==='spur'){bindSpurEvents();calcSpurGear();} else {bindPlanetaryEvents();calcPlanetaryGear();recommendPlanetaryCombos();}
 }
 
 function renderSpurGearForm(){
@@ -2048,6 +2139,15 @@ function renderPlanetaryGearForm(){
         <h3>📐 行星齿轮参数</h3>
         <div class="fg-row"><div class="fg"><label>模数 m</label><input type="number" id="pg_module" value="1.5" step="0.25"></div><div class="fg"><label>齿宽 b (mm)</label><input type="number" id="pg_facewidth" value="15" step="1"></div></div>
         <div class="fg"><label>行星轮数量</label><input type="number" id="pg_nplanets" value="3" step="1" min="2" max="6"></div>
+        <div class="gear-combo-assist">
+          <div class="gear-combo-head"><div><strong>推荐齿数组合</strong><span>按当前模数和行星轮数量，自动筛选可装配的标准无变位组合</span></div><span class="gear-combo-badge">标准无变位</span></div>
+          <div class="fg-row"><div class="fg"><label>目标减速比 i</label><input type="number" id="pg_target_ratio" value="4" min="1.1" step="0.1"></div><div class="fg"><label>允许速比误差 (%)</label><input type="number" id="pg_ratio_tol" value="5" min="0" max="30" step="0.5"></div></div>
+          <div class="fg-row"><div class="fg"><label>太阳轮最少齿数</label><input type="number" id="pg_min_sun" value="17" min="17" step="1"></div><div class="fg"><label>内齿圈最大分度圆 (mm)</label><input type="number" id="pg_max_ring_d" value="120" min="10" step="5"></div></div>
+          <button class="btn btn-ghost" type="button" style="width:100%" onclick="recommendPlanetaryCombos()">生成推荐组合</button>
+          <div id="pgComboResults"><div class="gear-combo-empty">填写目标后生成候选组合。</div></div>
+          <div class="gear-combo-foot">筛选条件：zᵣ=zₛ+2zₚ、等间距装配相位成立、太阳轮/行星轮≥17齿、相邻行星轮齿顶圆不相交。未计算变位、齿顶干涉与修形。</div>
+        </div>
+        <div class="section-band" style="margin-top:0">当前校核齿数</div>
         <div class="fg-row"><div class="fg"><label>太阳轮齿数 zₛ</label><input type="number" id="pg_zsun" value="18" step="1"></div><div class="fg"><label>内齿圈齿数 zᵣ</label><input type="number" id="pg_zring" value="54" step="1"></div></div>
         <div class="fg-row"><div class="fg"><label>输入转矩 (Nm,太阳轮)</label><input type="number" id="pg_torque_in" value="20" step="1"></div><div class="fg"><label>输入转速 (rpm)</label><input type="number" id="pg_rpm" value="2000" step="100"></div></div>
         <div class="fg-row"><div class="fg"><label>使用系数 Ka</label><input type="number" id="pg_service" value="1.35" min="1" step="0.05"></div><div class="fg"><label>总效率</label><input type="number" id="pg_eta" value="0.94" min="0.5" max="1" step="0.01"></div></div>
@@ -2059,12 +2159,49 @@ function renderPlanetaryGearForm(){
     </div>`;
 }
 
+function recommendPlanetaryCombos(){
+  const out=document.getElementById('pgComboResults');if(!out)return;
+  const m=+document.getElementById('pg_module').value,np=+document.getElementById('pg_nplanets').value,target=+document.getElementById('pg_target_ratio').value,tol=+document.getElementById('pg_ratio_tol').value,minSun=+document.getElementById('pg_min_sun').value,maxRingD=+document.getElementById('pg_max_ring_d').value;
+  const errors=[];
+  if(!(m>0))errors.push('模数必须大于0');
+  if(!Number.isInteger(np)||np<2||np>6)errors.push('行星轮数量须为2～6的整数');
+  if(!(target>1))errors.push('目标减速比必须大于1');
+  if(!(tol>=0&&tol<=30))errors.push('允许误差须在0～30%之间');
+  if(!(minSun>=17)||!Number.isInteger(minSun))errors.push('太阳轮最少齿数须为≥17的整数');
+  if(!(maxRingD>0))errors.push('内齿圈最大分度圆必须大于0');
+  if(errors.length){out.innerHTML=`<div class="gear-combo-empty">${errors.join('；')}</div>`;out.dataset.candidateCount='0';return}
+  const maxZr=Math.min(360,Math.floor(maxRingD/m)),candidates=[];
+  for(let zs=minSun;zs<=maxZr-34;zs++){
+    for(let zr=zs+34;zr<=maxZr;zr++){
+      const diff=zr-zs;if(diff%2)continue;
+      const zp=diff/2;if(zp<17)continue;
+      if((zs+zr)%np!==0)continue;
+      const orbit=m*(zs+zp)/2,planetTipD=m*(zp+2),centerChord=2*orbit*Math.sin(Math.PI/np),clearance=centerChord-planetTipD;
+      if(clearance<Math.max(.2*m,.1))continue;
+      const ratio=1+zr/zs,error=Math.abs(ratio-target)/target*100,ringD=m*zr;
+      candidates.push({zs,zp,zr,ratio,error,ringD,clearance});
+    }
+  }
+  candidates.sort((a,b)=>a.error-b.error||a.ringD-b.ringD||b.clearance-a.clearance);
+  const within=candidates.filter(x=>x.error<=tol+1e-9),shown=(within.length?within:candidates).slice(0,5),currentSun=+document.getElementById('pg_zsun').value,currentRing=+document.getElementById('pg_zring').value;
+  if(!shown.length){out.innerHTML='<div class="gear-combo-empty">当前尺寸和行星数量下没有标准无变位组合。可增大齿圈直径、降低太阳轮最少齿数或更换行星轮数量。</div>';out.dataset.candidateCount='0';return}
+  const notice=within.length?'':`<div class="gear-combo-empty">±${tol.toFixed(1)}%内没有组合，以下显示最接近目标速比的候选。</div>`;
+  out.innerHTML=`${notice}<div class="gear-combo-list">${shown.map(c=>`<button class="gear-combo-row${c.zs===currentSun&&c.zr===currentRing?' selected':''}" type="button" onclick="applyPlanetaryCombo(${c.zs},${c.zr})" aria-label="采用太阳轮${c.zs}齿、行星轮${c.zp}齿、内齿圈${c.zr}齿"><span><strong>zₛ ${c.zs} / zₚ ${c.zp} / zᵣ ${c.zr}</strong>${np}个行星轮</span><span class="combo-ratio">i=${c.ratio.toFixed(3)}<br>误差 ${c.error.toFixed(2)}%</span><span>齿圈 d=${c.ringD.toFixed(1)} mm<br>行星净间隙≈${c.clearance.toFixed(1)} mm</span><span class="combo-apply">›</span></button>`).join('')}</div>`;
+  out.dataset.candidateCount=String(shown.length);out.dataset.withinTolerance=String(within.length>0);
+}
+
+function applyPlanetaryCombo(zs,zr){
+  const sun=document.getElementById('pg_zsun'),ring=document.getElementById('pg_zring');if(!sun||!ring)return;
+  sun.value=String(zs);ring.value=String(zr);calcPlanetaryGear();recommendPlanetaryCombos();toast(`已采用推荐组合：zₛ=${zs}，zᵣ=${zr}`);
+}
+
 function bindSpurEvents(){
   document.querySelectorAll('#sg_module,#sg_facewidth,#sg_z1,#sg_z2,#sg_torque,#sg_rpm,#sg_service,#sg_eta,#sg_material1,#sg_material2').forEach(el=>el.addEventListener('input',calcSpurGear));
 }
 
 function bindPlanetaryEvents(){
   document.querySelectorAll('#pg_module,#pg_facewidth,#pg_nplanets,#pg_zsun,#pg_zring,#pg_torque_in,#pg_rpm,#pg_service,#pg_eta,#pg_material').forEach(el=>el.addEventListener('input',calcPlanetaryGear));
+  document.querySelectorAll('#pg_module,#pg_nplanets,#pg_zsun,#pg_zring,#pg_target_ratio,#pg_ratio_tol,#pg_min_sun,#pg_max_ring_d').forEach(el=>el.addEventListener('input',recommendPlanetaryCombos));
 }
 // ============================================================
 // RENDER: Knowledge Base
