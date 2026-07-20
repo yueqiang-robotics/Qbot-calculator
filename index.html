@@ -333,6 +333,146 @@ footer span{color:var(--accent)}
 @media(max-width:760px){.urdf-editor-layout{grid-template-columns:1fr}.prop-grid{grid-template-columns:1fr}.prop-grid .wide,.prop-section{grid-column:auto}.urdf-object-list{max-height:240px}.urdf-work-tabs{overflow-x:auto}.urdf-work-tabs button{white-space:nowrap}.report-bar{align-items:flex-start;flex-direction:column}.draft-actions{display:flex;margin:6px 0 0;justify-content:center}.mount-choice-grid{grid-template-columns:1fr}.kb-step-grid{grid-template-columns:1fr}}
 .compact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px}.check-list{display:grid;gap:6px}.check-item{padding:8px 10px;border:1px solid var(--border);border-radius:5px;font-size:11px;line-height:1.45}.check-item.good{border-left:3px solid var(--good)}.check-item.warn{border-left:3px solid var(--warn)}.check-item.danger{border-left:3px solid var(--danger)}
 .section-band{margin:16px 0 8px;font-size:12px;font-weight:700;color:var(--text);padding-bottom:6px;border-bottom:1px solid var(--border)}
+
+/* Light engineering workspace: navigation stays dark, working content turns light. */
+.topbar{background:#101513;border-color:#27302c;box-shadow:0 2px 12px rgba(0,0,0,.32)}
+.subnav{background:#151b18;border-color:#2a332f}
+.sidebar{background:#111714;border-color:#29322e}
+.sidebar .tree-item:hover{background:rgba(255,255,255,.055)}
+.sidebar .tree-item.active{background:rgba(43,201,162,.13);box-shadow:inset 2px 0 0 var(--accent)}
+
+.content{
+  --panel:#ffffff;--border:#d9e1dd;--border-light:#c5d0ca;
+  --text:#34433c;--text-dim:#68776f;--text-bright:#17231e;
+  --accent:#168b70;--accent-dim:rgba(22,139,112,.09);
+  --radius:4px;--radius-lg:6px;--shadow:0 2px 8px rgba(32,58,47,.065);
+  background:#f3f6f4;color:var(--text);color-scheme:light;
+}
+.content .home-content{padding-bottom:24px}
+.content .home-hero{border-color:var(--border)}
+.content .home-hero h1,.content .home-section-head h2,.content .home-metric strong,.content .home-tool h3,
+.content .sec-title,.content .panel h3,.content .type-card .card-name,
+.content .r-card .r-value,.content .q-rec-card .q-supplier,
+.content .placeholder-page .ph-title,.content .kb-card .kb-brand,
+.content .mount-choice strong,.content .cop-copy strong,
+.content .hand-skeleton-legend strong,.content .kb-step strong,
+.content .kb-gate h4,.content .kb-formula h4,.content .kb-library-card h4,
+.content .audit-strip strong,.content .info-callout strong{color:var(--text-bright)}
+.content .home-tool-grid{gap:12px}
+.content .home-tool{
+  --tool-color:#3e94c8;--tool-rgb:62,148,200;min-height:142px;padding:15px 16px 14px 19px;
+  background:#fff;border-width:2px;border-color:rgba(var(--tool-rgb),.72);border-radius:4px;box-shadow:none;
+}
+.content .home-tool::before{inset:0 auto 0 0;width:4px;height:auto;opacity:1}
+.content .home-tool:hover{transform:none;background:rgba(var(--tool-rgb),.055);border-color:rgb(var(--tool-rgb));box-shadow:inset 0 0 0 1px rgba(var(--tool-rgb),.13)}
+.content .home-tool-icon{width:25px;height:25px;place-items:center start;margin-bottom:9px;border:0;border-radius:0;background:transparent}
+.content .home-tool-icon .ui-icon{width:23px;height:23px}
+.content .home-tool::after{right:12px;bottom:9px}
+.content .home-quick-flow span{background:#fff}
+.content .home-step-num{background:#fff}
+.content .type-card,.content .panel,.content .kb-card,.content .kb-step,
+.content .kb-formula,.content .kb-library-card{background:#fff}
+.content .type-card:hover,.content .kb-card:hover{transform:none;box-shadow:0 3px 10px rgba(32,58,47,.08)}
+.content .btn,.content .preset-chip,.content .mode-tab,.content .type-card,
+.content .mount-choice,.content .r-card{border-radius:4px}
+.content .home-eyebrow,.content .r-card .r-label,.content .arm-config-label,
+.content .calc-layout>.panel.sticky::before,.content .calc-layout>:not(.panel.sticky)::before{letter-spacing:0}
+
+/* Input and output are separate work zones without adding extra controls. */
+.content .calc-layout{align-items:start;gap:18px}
+.content .calc-layout>.panel.sticky{
+  background:#f7faf8;border-color:#cdd9d3;box-shadow:0 3px 14px rgba(35,66,53,.065);
+}
+.content .calc-layout>.panel.sticky::before,
+.content .calc-layout>:not(.panel.sticky)::before{
+  display:block;margin:-16px -16px 14px;padding:9px 13px;
+  border-bottom:1px solid var(--border);font-size:11px;font-weight:800;
+  letter-spacing:.5px;color:var(--text-bright);
+}
+.content .calc-layout>.panel.sticky::before{
+  content:'输入条件';background:#edf4f1;border-left:3px solid var(--accent);
+}
+.content .calc-layout>:not(.panel.sticky){
+  min-width:0;padding:16px;background:#fff;border:1px solid var(--border);
+  border-radius:var(--radius-lg);box-shadow:var(--shadow);
+}
+.content .calc-layout>:not(.panel.sticky)::before{
+  content:'计算输出';background:#f7f9f8;border-left:3px solid #3f76a8;
+}
+
+.content .fg input[type=number],.content .fg textarea,.content .fg select,
+.content .hand-joint-config select,.content .prop-field input,.content .prop-field select{
+  background:#fff;color:var(--text-bright);border-color:#cfd9d4;box-shadow:inset 0 1px 2px rgba(28,52,42,.035);
+}
+.content .fg input[type=number]:focus,.content .fg textarea:focus,.content .fg select:focus,
+.content .hand-joint-config select:focus,.content .prop-field input:focus,.content .prop-field select:focus{
+  outline:none;border-color:var(--accent);box-shadow:0 0 0 2px rgba(22,139,112,.1);
+}
+.content .fg input[type=range]{background:#d5ded9}
+.content .fg input[type=range]::-webkit-slider-thumb{border-color:#fff}
+.content .fg label .range-number-input{
+  flex:0 0 72px;width:72px!important;height:25px;margin-left:auto;padding:2px 5px!important;
+  border:1px solid #bccbc4!important;border-radius:3px!important;background:#fff!important;
+  color:var(--text-bright)!important;font-size:11px!important;font-weight:700;text-align:right;
+  font-variant-numeric:tabular-nums;box-shadow:none!important;
+}
+.content .fg label .range-number-input:focus{outline:none;border-color:var(--accent)!important;box-shadow:0 0 0 2px rgba(22,139,112,.1)!important}
+.content .fg label .range-number-input.invalid{border-color:var(--danger)!important;background:rgba(231,76,60,.055)!important}
+.content .btn-primary{color:#fff}
+.content .btn-ghost{background:#e7eeea;color:var(--text)}
+.content .btn-ghost:hover{background:#dbe5e0}
+.content .preset-chip,.content .mode-tab,.content .mount-choice,
+.content .kb-tabs button,.content .urdf-work-tabs button,.content .urdf-kind-tabs button{
+  background:#f7f9f8;color:var(--text-dim)
+}
+.content .mode-tab.active{color:#fff}
+.content .mount-choice:hover,.content .mount-choice.active{background:var(--accent-dim)}
+.content .cop-guide,.content .hand-force-note,.content .report-bar,
+.content .legal-notice,.content .audit-strip,.content .tip-mass-hint{background:#f6f9f7}
+.content .q-mark{background:#fff}
+.content .report-bar-mark{background:#fff}
+
+.content .r-card{background:#f7faf8;border-color:#d8e2dd;box-shadow:0 1px 4px rgba(32,58,47,.035)}
+.content .data-table th{background:#edf2ef;color:#596961}
+.content .data-table td{border-color:#dfe6e2}
+.content .data-table tbody tr:hover{background:#f6f9f7}
+.content .q-rec-card{background:rgba(22,139,112,.055)}
+.content .q-rec-card .q-table td{border-color:#e0e7e3}
+.content .mode-tabs{background:#f7f9f8}
+.content .dim-group,.content .confidence-item{background:#f1f5f3}
+.content .workflow-step{background:#fff}
+.content .section-band{color:var(--text-bright)}
+
+.content .gear-combo-row,.content .gear-combo-empty{background:#f7faf8}
+.content .gear-combo-row strong,.content .gear-combo-head strong{color:var(--text-bright)}
+.content .gear-sketch{border-color:#cbd6d0;box-shadow:0 3px 13px rgba(29,49,41,.12)}
+.content .gear-sketch-head{border-color:#34413b}
+.content .gear-sketch-head strong{color:#fff}
+.content .gear-sketch-head span{color:#94a39c}
+
+.content .kb-gate{background:#f7f9f8}
+.content .kb-source-state,.content .kb-subtabs{background:#f1f5f3}
+.content .kb-subtabs button{color:var(--text-dim)}
+.content .kb-library-card,.content .kb-formula,.content .kb-step{box-shadow:0 1px 5px rgba(32,58,47,.035)}
+.content .source-chip{background:#fff}
+.content .check-item{background:#fff}
+
+.content .urdf-object,.content .urdf-map-row{background:#fff;color:var(--text)}
+.content #urdfFilter{background:#fff!important;color:var(--text-bright)!important;border-color:#cfd9d4!important}
+.content #urdfFilter:focus{outline:none;border-color:var(--accent)!important;box-shadow:0 0 0 2px rgba(22,139,112,.1)}
+.content .urdf-object:hover,.content .urdf-object.active,
+.content .urdf-map-row:hover{background:var(--accent-dim)}
+.content .urdf-source-map{background:#f7f9f8}
+.content .urdf-map-key strong{color:var(--text-bright)}
+.content .urdf-input,.content .urdf-source-preview{color-scheme:dark}
+.content .hand-skeleton .joint{fill:#fff}
+.content .hand-skeleton .joint-code{fill:#314139}
+.content .hand-skeleton .digit-label{fill:#68776f}
+
+@media(max-width:1000px){
+  .content .panel.sticky{position:static}
+  .content .calc-layout{gap:14px}
+}
 @media(max-width:820px){
   .topbar{height:auto;min-height:52px;flex-wrap:wrap;padding:8px 12px}.topbar .logo{margin-right:8px}.topbar .prim-nav{order:3;width:100%;overflow-x:auto}.top-actions{margin-left:auto}.top-actions .btn span{display:none}
   .sidebar{display:none}.content{padding:16px 12px}.subnav{padding:0 10px}.result-cards{grid-template-columns:1fr 1fr!important}
@@ -1363,7 +1503,8 @@ function calcSpurGear(){
   const meshEta=+document.getElementById('sg_eta').value;
   const mat1=GEAR_MATERIALS[matKey1]||GEAR_MATERIALS['45钢调质'],mat2=GEAR_MATERIALS[matKey2]||GEAR_MATERIALS['45钢调质'],contactAllow=Math.min(mat1[1],mat2[1]);
   const errors=[];
-  if(!(m>0))errors.push('模数必须大于0');if(!(b>0))errors.push('齿宽必须大于0');if(!Number.isInteger(z1)||!Number.isInteger(z2))errors.push('齿数必须为整数');else if(z1<17||z2<17)errors.push('当前模型按20°标准全齿高无变位齿轮计算，主动轮和从动轮齿数均须≥17；少齿设计需引入变位系数后另行校核');if(!(T1>=0)||!(rpm>0))errors.push('转矩不得为负且转速必须大于0');if(!(Ka>=1)||!(meshEta>0&&meshEta<=1))errors.push('使用系数应≥1，效率应在0~1之间');
+  if(!(m>0))errors.push('模数必须大于0');if(!(b>0))errors.push('齿宽必须大于0');if(!Number.isInteger(z1)||!Number.isInteger(z2))errors.push('齿数必须为整数');else if(z1<6||z2<6)errors.push('Lewis简式要求主动轮和从动轮齿数均≥6；更少齿数不能在本页继续概算');if(!(T1>=0)||!(rpm>0))errors.push('转矩不得为负且转速必须大于0');if(!(Ka>=1)||!(meshEta>0&&meshEta<=1))errors.push('使用系数应≥1，效率应在0~1之间');
+  const undercutRisk=Number.isInteger(z1)&&Number.isInteger(z2)&&(z1<17||z2<17),severeUndercut=undercutRisk&&Math.min(z1,z2)<12;
   const sketch=gearSketchShell('sgGearCanvas','平行轴齿轮比例与齿数示意','分度圆尺寸、中心距和每轮实际齿数随左侧参数更新',960,480);
   if(errors.length){document.getElementById('sgResults').innerHTML=`${sketch}<div class="status-box danger"><strong>输入无效</strong><br>${errors.join('；')}</div>`;drawSpurGearCanvas(document.getElementById('sgGearCanvas'),m,z1,z2);return;}
 
@@ -1384,12 +1525,16 @@ function calcSpurGear(){
   const T1Allow=FtAllow*d1/2000,T2Allow=FtAllow*d2/2000*meshEta,T2=T1*ratio*meshEta;
   const utilization=T1Allow>0?T1/T1Allow*100:Infinity;
   const sbSafe=sigmaB1<mat1[0]&&sigmaB2<mat2[0],shSafe=sigmaH<contactAllow,allSafe=sbSafe&&shSafe;
+  const strengthClass=undercutRisk?(severeUndercut?'danger':'warn'):(allSafe?'good':'danger');
+  const utilizationClass=undercutRisk?(severeUndercut?'danger':'warn'):(utilization<=100?'good':'danger');
+  const undercutGears=[z1<17?'主动轮 z₁='+z1:'',z2<17?'从动轮 z₂='+z2:''].filter(Boolean).join('、');
+  const undercutNotice=undercutRisk?`<div class="status-box ${severeUndercut?'danger':'warn'}"><strong>${severeUndercut?'严重少齿根切风险':'少齿根切提示'}</strong><br>${undercutGears} 低于20°标准全齿高无变位常用下限17齿。可继续查看量级，但根切会削弱齿根并改变实际齿形，Lewis简式不能补偿这部分损失；下方“许用”值降级为模型边界，不用于定型。应结合正变位、压力角或短齿制，重新校核齿顶厚度、重合度、滑动与ISO/GB强度。</div>`:'';
 
-  document.getElementById('sgResults').innerHTML=`${sketch}
+  document.getElementById('sgResults').innerHTML=`${sketch}${undercutNotice}
     <div class="result-cards" style="grid-template-columns:repeat(4,1fr)">
-      <div class="r-card ${allSafe?'good':'danger'}"><div class="r-label">主动轮许用输入</div><div class="r-value">${T1Allow.toFixed(2)}</div><div class="r-unit">Nm · 当前 ${T1.toFixed(2)} Nm</div></div>
-      <div class="r-card ${allSafe?'good':'danger'}"><div class="r-label">从动轮许用输出</div><div class="r-value">${T2Allow.toFixed(2)}</div><div class="r-unit">Nm · 当前约 ${T2.toFixed(2)} Nm</div></div>
-      <div class="r-card ${utilization<=100?'good':'danger'}"><div class="r-label">扭矩利用率</div><div class="r-value">${utilization.toFixed(0)}%</div><div class="r-unit">100%为当前简化模型边界</div></div>
+      <div class="r-card ${strengthClass}"><div class="r-label">${undercutRisk?'主动轮模型输入边界*':'主动轮许用输入'}</div><div class="r-value">${T1Allow.toFixed(2)}</div><div class="r-unit">Nm · 当前 ${T1.toFixed(2)} Nm</div></div>
+      <div class="r-card ${strengthClass}"><div class="r-label">${undercutRisk?'从动轮模型输出边界*':'从动轮许用输出'}</div><div class="r-value">${T2Allow.toFixed(2)}</div><div class="r-unit">Nm · 当前约 ${T2.toFixed(2)} Nm</div></div>
+      <div class="r-card ${utilizationClass}"><div class="r-label">扭矩利用率</div><div class="r-value">${utilization.toFixed(0)}%</div><div class="r-unit">100%为当前简化模型边界</div></div>
       <div class="r-card warn"><div class="r-label">控制因素</div><div class="r-value" style="font-size:16px">${limiting[0]}</div><div class="r-unit">允许圆周力 ${FtAllow.toFixed(0)} N</div></div>
     </div>
     <table class="data-table">
@@ -1410,7 +1555,7 @@ function calcSpurGear(){
       <strong>概念强度口径</strong><br>
       许用扭矩通过反解允许圆周力得到：主动轮弯曲、从动轮弯曲、齿面接触三项取最小值，再分别乘主动/从动轮分度圆半径；输出侧计入啮合效率${meshEta.toFixed(2)}。<br>
       齿根采用 Lewis 式 σF=Ft·Ka·Kv/(b·m·πy)，其中 y=0.154−0.912/z；Kv=1+v/10 仅是未指定精度等级时的简化速度系数。<br>
-      <strong>${allSafe?'当前扭矩低于简化许用值':'当前扭矩超过简化许用值'}</strong> · 接触许用值取两轮材料中较低者 ${contactAllow} MPa · 材料表为概念阶段参考许用值，未计齿向分布、精度、修形、可靠度、润滑与温度，定型仍按 GB/T 3480 / ISO 6336 复核。
+      <strong>${undercutRisk?'少齿根切工况不输出定型许用结论':allSafe?'当前扭矩低于简化许用值':'当前扭矩超过简化许用值'}</strong> · 接触许用值取两轮材料中较低者 ${contactAllow} MPa · 材料表为概念阶段参考许用值，未计齿向分布、精度、修形、可靠度、润滑与温度，定型仍按 GB/T 3480 / ISO 6336 复核。
     </div>`;
   drawSpurGearCanvas(document.getElementById('sgGearCanvas'),m,z1,z2);
   autoSave();
@@ -1434,9 +1579,10 @@ function calcPlanetaryGear(){
   if(!(m>0)||!(b>0)||!(Ti>=0)||!(rpm>0))errors.push('模数、齿宽、转速必须大于0且转矩不得为负');
   if(!(Ka>=1)||!(meshEta>0&&meshEta<=1))errors.push('使用系数应≥1，效率应在0~1之间');
   if(![np,zs,zr].every(Number.isInteger)||np<2||zr<=zs)errors.push('行星数和齿数必须为有效整数');
-  if(Number.isInteger(zs)&&Number.isInteger(zp)&&(zs<17||zp<17))errors.push('当前模型按20°标准全齿高无变位外齿轮计算，太阳轮和行星轮齿数均须≥17；少齿设计需引入变位系数后另行校核');
+  if(Number.isInteger(zs)&&Number.isInteger(zp)&&(zs<6||zp<6))errors.push('Lewis简式要求太阳轮和行星轮齿数均≥6；更少齿数不能在本页继续概算');
   if(!Number.isInteger(zp))errors.push('(内齿圈齿数−太阳轮齿数)/2 必须为整数');
   if(Number.isInteger(np)&&(zs+zr)%np!==0)errors.push('(太阳轮齿数+内齿圈齿数)/行星数 必须为整数，才能等间距装配');
+  const undercutRisk=Number.isInteger(zs)&&Number.isInteger(zp)&&(zs<17||zp<17),severeUndercut=undercutRisk&&Math.min(zs,zp)<12;
   const sketch=gearSketchShell('pgGearCanvas','NGW行星齿轮比例与齿数示意','太阳轮、行星轮、内齿圈及行星数量随左侧参数更新',960,560);
   if(errors.length){document.getElementById('pgResults').innerHTML=`${sketch}<div class="status-box danger"><strong>几何/装配条件不成立</strong><br>${errors.join('；')}</div>`;drawPlanetaryGearCanvas(document.getElementById('pgGearCanvas'),m,np,zs,zr);return;}
   const ratio = (zr + zs) / zs; // ring fixed, sun input, carrier output
@@ -1454,12 +1600,16 @@ function calcPlanetaryGear(){
   const limits=[['太阳轮齿根弯曲',FtBS],['行星轮齿根弯曲',FtBP],['太阳轮-行星轮接触',FtH]],limiting=limits.reduce((a,x)=>x[1]<a[1]?x:a),FtAllow=limiting[1];
   const TiAllow=FtAllow*(ds/1000)/2*np/loadShare,ToAllow=TiAllow*ratio*meshEta,To=Ti*ratio*meshEta,utilization=Ti/TiAllow*100;
   const sbSafe=sigmaBS<mat[0]&&sigmaBP<mat[0],shSafe=sigmaH<mat[1],allSafe=sbSafe&&shSafe;
+  const strengthClass=undercutRisk?(severeUndercut?'danger':'warn'):(allSafe?'good':'danger');
+  const utilizationClass=undercutRisk?(severeUndercut?'danger':'warn'):(utilization<=100?'good':'danger');
+  const undercutGears=[zs<17?'太阳轮 zₛ='+zs:'',zp<17?'行星轮 zₚ='+zp:''].filter(Boolean).join('、');
+  const undercutNotice=undercutRisk?`<div class="status-box ${severeUndercut?'danger':'warn'}"><strong>${severeUndercut?'严重少齿根切风险':'少齿根切提示'}</strong><br>${undercutGears} 低于20°标准全齿高无变位外齿轮常用下限17齿。当前只继续计算太阳轮—行星轮外啮合量级；根切会削弱齿根，且尚未计算变位后的中心距、内啮合干涉、齿顶厚度与滑动。下方“许用”值降级为模型边界，不能直接作为行星减速器定型结论。</div>`:'';
 
-  document.getElementById('pgResults').innerHTML=`${sketch}
+  document.getElementById('pgResults').innerHTML=`${sketch}${undercutNotice}
     <div class="result-cards" style="grid-template-columns:repeat(4,1fr)">
-      <div class="r-card ${allSafe?'good':'danger'}"><div class="r-label">太阳轮许用输入</div><div class="r-value">${TiAllow.toFixed(2)}</div><div class="r-unit">Nm · 当前 ${Ti.toFixed(2)} Nm</div></div>
-      <div class="r-card ${allSafe?'good':'danger'}"><div class="r-label">行星架许用输出</div><div class="r-value">${ToAllow.toFixed(2)}</div><div class="r-unit">Nm · 当前约 ${To.toFixed(2)} Nm</div></div>
-      <div class="r-card ${utilization<=100?'good':'danger'}"><div class="r-label">扭矩利用率</div><div class="r-value">${utilization.toFixed(0)}%</div><div class="r-unit">简化太阳轮外啮合边界</div></div>
+      <div class="r-card ${strengthClass}"><div class="r-label">${undercutRisk?'太阳轮模型输入边界*':'太阳轮许用输入'}</div><div class="r-value">${TiAllow.toFixed(2)}</div><div class="r-unit">Nm · 当前 ${Ti.toFixed(2)} Nm</div></div>
+      <div class="r-card ${strengthClass}"><div class="r-label">${undercutRisk?'行星架模型输出边界*':'行星架许用输出'}</div><div class="r-value">${ToAllow.toFixed(2)}</div><div class="r-unit">Nm · 当前约 ${To.toFixed(2)} Nm</div></div>
+      <div class="r-card ${utilizationClass}"><div class="r-label">扭矩利用率</div><div class="r-value">${utilization.toFixed(0)}%</div><div class="r-unit">简化太阳轮外啮合边界</div></div>
       <div class="r-card warn"><div class="r-label">控制因素</div><div class="r-value" style="font-size:16px">${limiting[0]}</div><div class="r-unit">单啮合允许力 ${FtAllow.toFixed(0)} N</div></div>
     </div>
     <table class="data-table">
@@ -1478,7 +1628,7 @@ function calcPlanetaryGear(){
       <strong>概念强度口径</strong><br>
       内齿圈固定、太阳轮输入、行星架输出。许用扭矩由太阳轮弯曲、行星轮弯曲、外啮合接触三项反解并取最小值，行星间载荷不均系数${loadShare.toFixed(2)}，输出效率${meshEta.toFixed(2)}。<br>
       齿根采用 Lewis 式 σF=Ft·Ka·Kv/(b·m·πy)，其中 y=0.154−0.912/z；Kv=1+v/10 仅是简化速度系数。<br>
-      <strong>${allSafe?'当前扭矩低于简化许用值':'当前扭矩超过简化许用值'}</strong> · 材料表为概念阶段参考许用值；尚未校核内齿圈内啮合、行星销轴、轴承、行星架与浮动均载，定型按 GB/T 3480 / ISO 6336 复核。
+      <strong>${undercutRisk?'少齿根切工况不输出定型许用结论':allSafe?'当前扭矩低于简化许用值':'当前扭矩超过简化许用值'}</strong> · 材料表为概念阶段参考许用值；尚未校核内齿圈内啮合、行星销轴、轴承、行星架与浮动均载，定型按 GB/T 3480 / ISO 6336 复核。
     </div>`;
   drawPlanetaryGearCanvas(document.getElementById('pgGearCanvas'),m,np,zs,zr);
   autoSave();
@@ -1747,6 +1897,39 @@ function exportUrdfReport(){
   if(!lastUrdfReport){toast('请先检查URDF');return}const blob=new Blob([JSON.stringify(lastUrdfReport,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Qbot-URDF-audit-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('检查报告已导出');
 }
 
+function setRangeValueDisplay(el,value){
+  if(!el)return;
+  if(el.matches?.('input.range-number-input'))el.value=String(value);
+  else el.textContent=String(value);
+}
+
+function enhanceRangeNumericInputs(root=document.getElementById('content')){
+  if(!root)return;
+  root.querySelectorAll('.calc-layout>.panel.sticky .fg input[type="range"]').forEach(range=>{
+    const label=range.closest('.fg')?.querySelector('label'),display=label?.querySelector('.val');
+    if(!display||display.matches('input.range-number-input'))return;
+    const input=document.createElement('input');
+    input.type='number';input.id=display.id;input.className='val range-number-input';
+    input.min=range.min;input.max=range.max;input.step=range.step||'any';input.value=range.value;
+    input.dataset.rangeId=range.id;input.title='可直接输入，也可拖动下方滑杆';
+    input.setAttribute('aria-label',(label.childNodes[0]?.textContent||range.id).trim()+' 数值');
+    display.replaceWith(input);
+    const applyValue=clamp=>{
+      if(input.value.trim()===''){input.classList.add('invalid');return;}
+      let value=Number(input.value);const min=Number(range.min),max=Number(range.max);
+      if(!Number.isFinite(value)){input.classList.add('invalid');return;}
+      if(clamp){if(Number.isFinite(min))value=Math.max(min,value);if(Number.isFinite(max))value=Math.min(max,value);}
+      else if((Number.isFinite(min)&&value<min)||(Number.isFinite(max)&&value>max)){input.classList.add('invalid');return;}
+      range.value=String(value);input.value=range.value;input.classList.remove('invalid');
+      range.dispatchEvent(new Event('input',{bubbles:true}));
+    };
+    input.addEventListener('input',()=>applyValue(false));
+    input.addEventListener('change',()=>applyValue(true));
+    input.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();input.blur();}});
+    range.addEventListener('input',()=>{input.value=range.value;input.classList.remove('invalid');});
+  });
+}
+
 // ============================================================
 // RENDER: Main content dispatcher
 // ============================================================
@@ -1763,7 +1946,7 @@ function renderHome(){
   ];
   document.getElementById('content').innerHTML=`<div class="home-content">
     <section class="home-hero">
-      <div class="home-hero-copy"><div class="home-eyebrow">ROBOT STRUCTURE · QUICK ESTIMATE</div><h1 aria-label="Qbot Pro"><span class="home-q">Q</span><span>bot Pro</span></h1><div class="home-hero-sub">机器人结构快速估算台</div>
+      <div class="home-hero-copy"><div class="home-eyebrow">机器人结构工程 · 快速估算</div><h1 aria-label="Qbot Pro"><span class="home-q">Q</span><span>bot Pro</span></h1><div class="home-hero-sub">机器人结构快速估算台</div>
       <p>把机器人概念阶段常用的关节、腿足、灵巧手、底盘、齿轮、倾覆和URDF工具集中到一个离线页面。先判断量级、比较方案和形成选型门槛，再进入专业设计与验证。</p>
       <div class="home-quick-flow"><span>选任务</span><i>→</i><span>填工况</span><i>→</i><span>看门槛</span><i>→</i><span>导出报告</span></div>
       <div class="home-actions"><button class="btn btn-primary" onclick="navigate('robot','arm','cobot6')">开始机械臂选型</button><button class="btn btn-ghost" onclick="navigate('urdf')">打开URDF工作台</button></div>
@@ -1851,7 +2034,7 @@ function renderArmCalc(){
       <div>
         <div id="armCaseInfo" class="status-box info" style="margin-bottom:14px"></div>
         <div class="result-cards" id="armSumCards" style="grid-template-columns:repeat(4,1fr)"></div>
-        <div class="panel" style="margin-bottom:14px"><h3>📊 关节明细</h3><div style="overflow-x:auto"><table class="data-table" id="armJointTable"></table></div></div>
+        <div class="panel" style="margin-bottom:14px"><h3>关节明细</h3><div style="overflow-x:auto"><table class="data-table" id="armJointTable"></table></div></div>
         <div class="panel"><h3>完整关节模组选型门槛</h3>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px" id="armJointBtns"></div>
           <div class="match-panel" id="armMatchPanel"><div style="overflow-x:auto"><table class="data-table" id="armMatchTable"></table></div><div class="radar-wrap" id="armRadar"></div></div>
@@ -1868,6 +2051,7 @@ function renderArmCalc(){
   renderArmCaseChips();
   calcArm();
   renderQBundle();
+  enhanceRangeNumericInputs();
 }
 
 function setArmMode(mode){
@@ -1878,7 +2062,7 @@ function bindArmSliderLabels(){
   const map={arm_weight:'arm_vW',arm_len:'arm_vL',arm_payload:'arm_vP',arm_safety:'arm_vS',arm_speed:'arm_vV',arm_accel:'arm_vA',arm_cycle:'arm_vCycle',arm_peak_time:'arm_vPeakTime'};
   for(const[id,vid] of Object.entries(map)){
     const el=document.getElementById(id), vl=document.getElementById(vid);
-    if(el&&vl) vl.textContent = el.value;
+    if(el&&vl) setRangeValueDisplay(vl,el.value);
   }
 }
 
@@ -1963,13 +2147,14 @@ function renderLegCalc(){
   document.querySelectorAll('#content input,#content select').forEach(el=>el.addEventListener('input',()=>{markLegCaseCustom(el.id);calcLeg();bindLegLabels();}));
   renderLegCaseChips();
   calcLeg();
+  enhanceRangeNumericInputs();
 }
 
 function bindLegLabels(){
   const map={leg_weight:'leg_vW',leg_payload:'leg_vP',leg_len:'leg_vL',leg_support:'leg_vSupport',leg_knee:'leg_vKnee',leg_cop:'leg_vCop',leg_cop_lat:'leg_vCopLat',leg_ax:'leg_vAx',leg_ay:'leg_vAy',leg_az:'leg_vAz',leg_cycle:'leg_vCycle',leg_peak_time:'leg_vPeakTime',leg_safety:'leg_vS',leg_speed:'leg_vV',leg_eff:'leg_vE',leg_accel:'leg_vA'};
   for(const[id,vid] of Object.entries(map)){
     const el=document.getElementById(id), vl=document.getElementById(vid);
-    if(el&&vl) vl.textContent=['leg_eff','leg_support'].includes(id)?parseFloat(el.value).toFixed(2):el.value;
+    if(el&&vl) setRangeValueDisplay(vl,['leg_eff','leg_support'].includes(id)?parseFloat(el.value).toFixed(2):el.value);
   }
 }
 
@@ -2024,13 +2209,14 @@ function renderHandCalc(){
   document.querySelectorAll('#content input,#content select').forEach(el=>el.addEventListener('input',()=>{markHandCaseCustom(el.id);calcHand();bindHandLabels();}));
   renderHandCaseChips();
   calcHand();
+  enhanceRangeNumericInputs();
 }
 
 function bindHandLabels(){
   const map={hand_flen:'hand_vF',hand_pinch:'hand_vP',hand_thumb_pinch:'hand_vThumbP',hand_object_mass:'hand_vMass',hand_friction:'hand_vMu',hand_load_accel:'hand_vLoadA',hand_safety:'hand_vS',hand_speed:'hand_vV',hand_cycle:'hand_vCycle',hand_grip_time:'hand_vGrip'};
   for(const[id,vid] of Object.entries(map)){
     const el=document.getElementById(id), vl=document.getElementById(vid);
-    if(el&&vl) vl.textContent=id==='hand_friction'?parseFloat(el.value).toFixed(2):['hand_safety','hand_load_accel','hand_cycle','hand_grip_time'].includes(id)?parseFloat(el.value).toFixed(1):el.value;
+    if(el&&vl) setRangeValueDisplay(vl,id==='hand_friction'?parseFloat(el.value).toFixed(2):['hand_safety','hand_load_accel','hand_cycle','hand_grip_time'].includes(id)?parseFloat(el.value).toFixed(1):el.value);
   }
 }
 
@@ -2051,7 +2237,7 @@ function renderChassisCalc(){
 
     <div class="calc-layout">
       <div class="panel sticky">
-        <h3>📐 输入参数</h3>
+        <h3>输入参数</h3>
         <div class="fg"><label>整机重量 <span class="val" id="ch_vW">${p.weight}</span> kg</label><input type="range" id="ch_weight" min="20" max="2000" value="${p.weight}" step="5"></div>
         <div class="fg-row">
           <div class="fg"><label>轮径 <span class="val" id="ch_vD">${p.diam}</span> mm</label><input type="range" id="ch_diam" min="80" max="500" value="${p.diam}" step="10"></div>
@@ -2080,7 +2266,7 @@ function renderChassisCalc(){
       <div>
         <div class="result-cards" id="chSumCards" style="grid-template-columns:repeat(4,1fr)"></div>
         <div id="chStepInfo" class="status-box info" style="margin-bottom:14px"></div>
-        <div class="panel" style="margin-bottom:14px"><h3>📊 详细计算结果</h3><div style="overflow-x:auto"><table class="data-table" id="chResultTable"></table></div></div>
+        <div class="panel" style="margin-bottom:14px"><h3>详细计算结果</h3><div style="overflow-x:auto"><table class="data-table" id="chResultTable"></table></div></div>
         <div class="panel"><h3>驱动轮/轮毂模组选型门槛</h3><div style="overflow-x:auto"><table class="data-table" id="chHubMatch"></table></div></div>
       </div>
     </div>`;
@@ -2089,13 +2275,14 @@ function renderChassisCalc(){
   bindChLabels();
   document.querySelectorAll('#content input,#content select').forEach(el=>el.addEventListener('input',()=>{calcChassis();bindChLabels();}));
   calcChassis();
+  enhanceRangeNumericInputs();
 }
 
 function bindChLabels(){
   const map={ch_weight:'ch_vW',ch_diam:'ch_vD',ch_slope:'ch_vS',ch_speed:'ch_vV',ch_step:'ch_vStep',ch_acc:'ch_vA',ch_safety:'ch_vSF',ch_crr:'ch_vCrr',ch_eff:'ch_vEff',ch_loadfrac:'ch_vLoad',ch_mission:'ch_vMission',ch_drive_duty:'ch_vDuty',ch_aux:'ch_vAux'};
   for(const[id,vid] of Object.entries(map)){
     const el=document.getElementById(id), vl=document.getElementById(vid);
-    if(el&&vl) vl.textContent=el.value;
+    if(el&&vl) setRangeValueDisplay(vl,el.value);
   }
 }
 
@@ -2119,16 +2306,16 @@ function renderSpurGearForm(){
   return `
     <div class="calc-layout">
       <div class="panel sticky">
-        <h3>📐 齿轮参数</h3>
+        <h3>齿轮参数</h3>
         <div class="fg-row"><div class="fg"><label>模数 m</label><input type="number" id="sg_module" value="2" step="0.25"></div><div class="fg"><label>齿宽 b (mm)</label><input type="number" id="sg_facewidth" value="20" step="1"></div></div>
-        <div class="fg-row"><div class="fg"><label>主动轮齿数 z₁</label><input type="number" id="sg_z1" value="20" step="1"></div><div class="fg"><label>从动轮齿数 z₂</label><input type="number" id="sg_z2" value="60" step="1"></div></div>
+        <div class="fg-row"><div class="fg"><label>主动轮齿数 z₁</label><input type="number" id="sg_z1" value="20" min="6" step="1"></div><div class="fg"><label>从动轮齿数 z₂</label><input type="number" id="sg_z2" value="60" min="6" step="1"></div></div>
         <div class="fg-row"><div class="fg"><label>输入转矩 (Nm)</label><input type="number" id="sg_torque" value="10" step="1"></div><div class="fg"><label>输入转速 (rpm)</label><input type="number" id="sg_rpm" value="1500" step="100"></div></div>
         <div class="fg-row"><div class="fg"><label>使用系数 Ka</label><input type="number" id="sg_service" value="1.25" min="1" step="0.05"></div><div class="fg"><label>啮合效率</label><input type="number" id="sg_eta" value="0.97" min="0.5" max="1" step="0.01"></div></div>
         <div class="fg-row"><div class="fg"><label>主动轮材料/工艺</label><select id="sg_material1">${Object.keys(GEAR_MATERIALS).map(k=>`<option value="${k}">${k}</option>`).join('')}</select></div><div class="fg"><label>从动轮材料/工艺</label><select id="sg_material2">${Object.keys(GEAR_MATERIALS).map(k=>`<option value="${k}">${k}</option>`).join('')}</select></div></div>
-        <div class="formula-note">按20°标准全齿高无变位直齿轮估算，外齿轮齿数须≥17。齿根采用 Lewis 式 Y=π(0.154−0.912/z)，再与简化接触强度共同反解允许圆周力，三者取最小值。</div>
+        <div class="formula-note">按20°标准全齿高无变位直齿轮估算。17齿以下允许继续做根切量级概算，但不计算实际根切量和变位齿形，结果不作为定型许用值；齿根采用 Lewis 式 Y=π(0.154−0.912/z)，再与简化接触强度共同反解模型边界。</div>
         <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="calcSpurGear()">计算</button>
       </div>
-      <div id="sgResults"><div class="info-callout">👆 输入参数后点击"计算"查看结果</div></div>
+      <div id="sgResults"><div class="info-callout">输入参数后点击“计算”查看结果</div></div>
     </div>`;
 }
 
@@ -2136,7 +2323,7 @@ function renderPlanetaryGearForm(){
   return `
     <div class="calc-layout">
       <div class="panel sticky">
-        <h3>📐 行星齿轮参数</h3>
+        <h3>行星齿轮参数</h3>
         <div class="fg-row"><div class="fg"><label>模数 m</label><input type="number" id="pg_module" value="1.5" step="0.25"></div><div class="fg"><label>齿宽 b (mm)</label><input type="number" id="pg_facewidth" value="15" step="1"></div></div>
         <div class="fg"><label>行星轮数量</label><input type="number" id="pg_nplanets" value="3" step="1" min="2" max="6"></div>
         <div class="gear-combo-assist">
@@ -2148,14 +2335,14 @@ function renderPlanetaryGearForm(){
           <div class="gear-combo-foot">筛选条件：zᵣ=zₛ+2zₚ、等间距装配相位成立、太阳轮/行星轮≥17齿、相邻行星轮齿顶圆不相交。未计算变位、齿顶干涉与修形。</div>
         </div>
         <div class="section-band" style="margin-top:0">当前校核齿数</div>
-        <div class="fg-row"><div class="fg"><label>太阳轮齿数 zₛ</label><input type="number" id="pg_zsun" value="18" step="1"></div><div class="fg"><label>内齿圈齿数 zᵣ</label><input type="number" id="pg_zring" value="54" step="1"></div></div>
+        <div class="fg-row"><div class="fg"><label>太阳轮齿数 zₛ</label><input type="number" id="pg_zsun" value="18" min="6" step="1"></div><div class="fg"><label>内齿圈齿数 zᵣ</label><input type="number" id="pg_zring" value="54" min="18" step="1"></div></div>
         <div class="fg-row"><div class="fg"><label>输入转矩 (Nm,太阳轮)</label><input type="number" id="pg_torque_in" value="20" step="1"></div><div class="fg"><label>输入转速 (rpm)</label><input type="number" id="pg_rpm" value="2000" step="100"></div></div>
         <div class="fg-row"><div class="fg"><label>使用系数 Ka</label><input type="number" id="pg_service" value="1.35" min="1" step="0.05"></div><div class="fg"><label>总效率</label><input type="number" id="pg_eta" value="0.94" min="0.5" max="1" step="0.01"></div></div>
         <div class="fg"><label>材料/工艺</label><select id="pg_material">${Object.keys(GEAR_MATERIALS).map(k=>`<option value="${k}"${k==='20CrMnTi渗碳'?' selected':''}>${k}</option>`).join('')}</select></div>
-        <div class="formula-note">按20°标准全齿高无变位外齿轮估算，太阳轮和行星轮均须≥17齿；齿根采用 Lewis 式 Y=π(0.154−0.912/z)。许用扭矩只覆盖太阳轮-行星轮外啮合，内齿圈、行星销、轴承和行星架可能先失效。</div>
+        <div class="formula-note">标准无变位推荐仍要求太阳轮和行星轮均≥17齿；手动校核允许6～16齿继续做根切量级概算，但不计算变位、实际根切量与内啮合干涉。模型仅覆盖太阳轮-行星轮外啮合，内齿圈、行星销、轴承和行星架可能先失效。</div>
         <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="calcPlanetaryGear()">计算</button>
       </div>
-      <div id="pgResults"><div class="info-callout">👆 输入参数后点击"计算"查看结果</div></div>
+      <div id="pgResults"><div class="info-callout">输入参数后点击“计算”查看结果</div></div>
     </div>`;
 }
 
@@ -2519,7 +2706,7 @@ function renderTippingCalc(){
     <div class="type-grid">${Object.entries(sub.types).map(([k,t])=>`<div class="type-card${k===state.type?' selected':''}" onclick="selectType('${k}')"><div class="card-icon">${sub.icon}</div><div class="card-name">${t.name}</div><div class="card-spec">${t.spec}</div></div>`).join('')}</div>
     <div class="calc-layout">
       <div class="panel sticky" style="max-height:calc(100vh - 200px);overflow-y:auto;">
-        <h3>📐 参数</h3>
+        <h3>参数</h3>
         <div style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap;">
           <button class="tip-tab-btn active" onclick="tipSwitchTab('chassis')">底盘</button>
           <button class="tip-tab-btn" onclick="tipSwitchTab('arm')">手臂</button>
@@ -2540,19 +2727,20 @@ function renderTippingCalc(){
         </div>
         <div class="result-cards" id="tipSumCards" style="grid-template-columns:repeat(4,1fr);"></div>
         <div id="tipStatus" class="status-box info" style="margin-bottom:10px"></div>
-        <div class="panel"><h3>📊 稳定性指标</h3><div style="overflow-x:auto"><table class="data-table" id="tipTable"></table></div><div class="formula-note">前向静态裕量 d前 = 前轮轴线 − 整机质心投影；制动临界值 a临界 ≈ (重力恢复矩 − 抬臂动量矩)/(总质量×质心高)。安全系数 = 恢复矩/倾覆矩，1.0 为理论边界。未计轮胎弹性、间隙、控制延迟和碰撞冲击。</div></div>
+        <div class="panel"><h3>稳定性指标</h3><div style="overflow-x:auto"><table class="data-table" id="tipTable"></table></div><div class="formula-note">前向静态裕量 d前 = 前轮轴线 − 整机质心投影；制动临界值 a临界 ≈ (重力恢复矩 − 抬臂动量矩)/(总质量×质心高)。安全系数 = 恢复矩/倾覆矩，1.0 为理论边界。未计轮胎弹性、间隙、控制延迟和碰撞冲击。</div></div>
       </div>
     </div>`;
   bindTipLabels();
   tipRecalc();
   document.querySelectorAll('#content .tip-tab-btn').forEach(b=>b.onclick=function(){tipSwitchTab(this.textContent.includes('底盘')?'chassis':this.textContent.includes('手臂')?'arm':'env');});
+  enhanceRangeNumericInputs();
 }
 
 function tipSliders(arr){return arr.map(([l,k,min,max,step,u])=>`<div class="fg"><label><span id="tl-${k}">${l}</span> <span class="val" id="tv-${k}">${tipCfg[k]}</span> ${u}</label><input type="range" id="ts-${k}" min="${min}" max="${max}" step="${step}" value="${tipCfg[k]}" oninput="tipCfg['${k}']=parseFloat(this.value);tipRecalc();"></div>`).join('');}
 
 function bindTipLabels(){
   for(const k of Object.keys(tipCfg)){
-    const v=document.getElementById('tv-'+k);if(v)v.textContent=typeof tipCfg[k]==='number'?(Number.isInteger(tipCfg[k])?tipCfg[k]:tipCfg[k].toFixed(1)):tipCfg[k];
+    const v=document.getElementById('tv-'+k);if(v)setRangeValueDisplay(v,typeof tipCfg[k]==='number'?(Number.isInteger(tipCfg[k])?tipCfg[k]:tipCfg[k].toFixed(1)):tipCfg[k]);
     const s=document.getElementById('ts-'+k);if(s)s.value=tipCfg[k];
   }
   const massLabel=document.getElementById('tl-arm_mass'),massHint=document.getElementById('tipArmMassHint');
