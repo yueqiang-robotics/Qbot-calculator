@@ -378,6 +378,44 @@ footer span{color:var(--accent)}
 .content .home-eyebrow,.content .r-card .r-label,.content .arm-config-label,
 .content .calc-layout>.panel.sticky::before,.content .calc-layout>:not(.panel.sticky)::before{letter-spacing:0}
 
+/* Home surface: keep the brand mark crisp and make the task grid easier to scan. */
+body:has(.home-content) .content{background:#fff}
+.content .home-q{color:var(--accent)}
+.content .home-tool{
+  min-height:148px;
+  padding:18px;
+  border:0;
+  border-radius:4px;
+  background:#eef6fb;
+  box-shadow:none;
+}
+.content .home-tool::before{display:none}
+.content .home-tool h3{font-size:15px;line-height:1.35;margin-bottom:7px}
+.content .home-tool p{font-size:10.5px;line-height:1.55}
+.content .home-tool-output{font-size:10px}
+.content .home-tool:nth-child(2){background:#eef7f1}
+.content .home-tool:nth-child(3){background:#fff5e8}
+.content .home-tool:nth-child(4){background:#f2f0fb}
+.content .home-tool:nth-child(5){background:#eef6fb}
+.content .home-tool:nth-child(6){background:#f3f6ed}
+.content .home-tool:nth-child(7){background:#f1f4f8}
+.content .home-tool:nth-child(8){background:#f8f1ec}
+.content .home-tool:hover{background:color-mix(in srgb,var(--tool-color) 8%,white);box-shadow:0 4px 12px rgba(32,58,47,.08)}
+
+/* Light workspace notes: use tone and spacing as hierarchy instead of repeated dark frames. */
+.topbar .logo .logo-q{color:var(--accent)!important}
+.content .info-callout{background:#e8f1ed;border:0}
+.content .cop-guide,.content .hand-force-note,.content .report-bar,.content .audit-strip,.content .tip-mass-hint{
+  border:0;
+  border-left:3px solid var(--accent);
+  background:#e8f1ed;
+}
+.content .legal-notice{
+  border:0;
+  border-left:3px solid var(--warn);
+  background:#fbf1df;
+}
+
 /* Input and output are separate work zones without adding extra controls. */
 .content .calc-layout{align-items:start;gap:18px}
 .content .calc-layout>.panel.sticky{
@@ -428,7 +466,8 @@ footer span{color:var(--accent)}
 .content .mode-tab.active{color:#fff}
 .content .mount-choice:hover,.content .mount-choice.active{background:var(--accent-dim)}
 .content .cop-guide,.content .hand-force-note,.content .report-bar,
-.content .legal-notice,.content .audit-strip,.content .tip-mass-hint{background:#f6f9f7}
+.content .audit-strip,.content .tip-mass-hint{background:#e8f1ed}
+.content .legal-notice{background:#fbf1df!important}
 .content .q-mark{background:#fff}
 .content .report-bar-mark{background:#fff}
 
@@ -486,7 +525,7 @@ footer span{color:var(--accent)}
 <body>
 
 <header class="topbar">
-  <div class="logo" role="button" tabindex="0" aria-haspopup="dialog" aria-controls="qbotAboutModal" title="关于 Qbot Pro · 使用边界与责任声明" onclick="openQbotAbout()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openQbotAbout()}">Q<span>bot</span><span class="ver">PRO V5.21</span></div>
+  <div class="logo" role="button" tabindex="0" aria-haspopup="dialog" aria-controls="qbotAboutModal" title="关于 Qbot Pro · 使用边界与责任声明" onclick="openQbotAbout()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openQbotAbout()}"><span class="logo-q">Q</span><span>bot</span><span class="ver">PRO V5.21</span></div>
   <nav class="prim-nav" id="primNav">
     <a data-section="home" class="active">⌂ 首页</a>
     <a data-section="robot">🦾 Robot工坊</a>
@@ -581,7 +620,6 @@ const MODULES = {
         name: '轮式双臂倾覆分析', icon: UI_ICONS.stability,
         types: {
           custom:       {name:'自定义参数', spec:'自由调节所有参数 · 无预设约束', preset:{}},
-          preset450_84: {name:'450×450·轮Φ84·轴距360', spec:'URDF参考模板 · 额定双臂前伸 · 总负载2.4kg', preset:{wheelbase:360,chassis_length:500,chassis_height:180,chassis_weight:53.2,wheel_radius:42,track_width:387,torso_mass:7.2,torso_offset:150,arm_mass:8.2,arm_length:550,mount_height:1170,arm_extension:550,payload_mass:2.4,payload_reach:80}},
           mainstream:   {name:'主流服务机器人·500×500', spec:'50kg底盘·8寸轮·双臂6kg·900mm臂展·5kg负载', preset:{wheelbase:450,chassis_length:550,chassis_height:200,chassis_weight:50,wheel_radius:100,track_width:480,torso_mass:8,torso_offset:0,arm_mass:6,arm_length:900,mount_height:1350,arm_extension:900,payload_mass:5,payload_reach:100}},
         },
         status: 'live'
